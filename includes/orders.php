@@ -238,7 +238,9 @@ class SFE_Orders {
 		$event_post_id = $item->get_meta( '_sfe_event_id' ) ?? false;
 		
 		if ( $event_post_id ) {
-			$html .= '<div><strong>Event ID:</strong> ' . $event_post_id . '</div>';
+			if ( is_admin() ) {
+				$html .= '<div><strong>Event ID:</strong> ' . $event_post_id . '</div>';
+			}
 			
 			$event_title = $item->get_meta( '_sfe_event_title' ) ?: get_the_title( $event_post_id );
 			$html .= '<div><strong>Event Title:</strong> ' . $event_title . '</div>';
