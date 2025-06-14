@@ -29,6 +29,7 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 
 ### 1.1.6
 - Improved Class Type archive pages and added back link to customizable Classes main page
+- Updated to assign events to orders by order meta
 
 ### 1.1.5
 - First release
