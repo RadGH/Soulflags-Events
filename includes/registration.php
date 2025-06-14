@@ -100,7 +100,7 @@ class SFE_Registration {
 SELECT
 	DISTINCT o.id AS order_id
 
-FROM wp_wc_orders o
+FROM {$wpdb->prefix}wc_orders o
 
 JOIN wp_woocommerce_order_items oi
 	ON oi.order_id = o.id
