@@ -107,12 +107,11 @@ class SFE_Orders {
 			
 			if ( ! $event_post_id ) {
 				// Remove the item from the cart if it does not match
-				unset( $cart_items[ $key ] );
+				wc()->cart->remove_cart_item( $key );
 				
 				// Add a notice to the cart
 				$message = sprintf(
-					__( '[%s] You must purchase this product through the event page.', 'soulflags-events' ),
-					get_permalink( $product_id ),
+					__( '<strong>%s</strong>: You must purchase this product through the event page.', 'soulflags-events' ),
 					get_the_title( $product_id )
 				);
 				wc_add_notice( $message, 'error' );
