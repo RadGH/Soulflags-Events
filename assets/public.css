@@ -117,3 +117,39 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 .sfe-back-to-events {
 	margin-bottom: 60px;
 }
+
+
+/* Divi overrides because some CSS is not applying to The Events Calendar pages */
+body.et-db #et-boc footer.et-l .et_pb_section_0_tb_footer.et_pb_section {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+body.et-db #et-boc footer.et-l .et_pb_image_0_tb_footer {
+	margin-bottom: 10px !important;
+}
+
+body.et-db #et-boc footer.et-l .footer-row-2 {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+body.et-db #et-boc footer.et-l .et_pb_row_1_tb_footer.et_pb_row {
+	padding-top: 20px !important;
+	padding-bottom: 20px !important;
+}
+
+@media ( min-width: 980.1px ) {
+	body.et-db #et-boc footer.et-l .et_pb_section_0_tb_footer.et_pb_section {
+		padding-top: 100px !important;
+	}
+
+	body.et-db #et-boc footer.et-l .et_pb_top_inside_divider {
+		height: 120px !important;
+	}
+
+	body.et-db #et-boc footer.et-l .et_pb_image_0_tb_footer {
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+}
