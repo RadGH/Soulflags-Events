@@ -74,21 +74,46 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 	display: none;
 }
 
-/* Available Classes list [souflags_list_classes] */
-.sfe-classes-list {
+/* Available Classes Shortcode [souflags_list_classes] */
+.sfe-available-classes {
 	display: flex;
 	flex-direction: column;
 	gap: 40px;
 }
 
-.sfe-classes-list .class-post-list {
+/* Event List (Available classes shortcode and Class Type term page) */
+.sfe-classes-list {
 	margin-top: 10px;
 	margin-left: 20px;
 }
 
 .sfe-classes-list .event-row {
-	display: flex;
+	display: inline-flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	gap: 5px;
+}
+
+.sfe-classes-list .class-event.expired {
+	opacity: 0.75;
+}
+
+.sfe-classes-list .expired-label {
+	font-weight: 600;
+}
+
+/* Shortcode usage bottom margin */
+.entry-content > .sfe-classes-list:last-child {
+	margin-bottom: 30px;
+}
+
+/* Single term page */
+.term-class_type h1.main_title {
+	margin-bottom: 0;
+}
+.entry-content > .sfe-available-classes:last-child {
+	margin-bottom: 60px;
+}
+.sfe-back-to-events {
+	margin-bottom: 60px;
 }

@@ -354,7 +354,6 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 				'allow_in_bindings' => 0,
 				'bidirectional' => 1,
 				'bidirectional_target' => array(
-					0 => 'field_684a24424c8f9',
 				),
 				'ui' => 1,
 			),
@@ -407,6 +406,34 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 				'allow_in_bindings' => 0,
 				'bidirectional' => 0,
 				'multiple' => 0,
+				'bidirectional_target' => array(
+				),
+			),
+			array(
+				'key' => 'field_684db56380b55',
+				'label' => 'Classes Page',
+				'name' => 'classes_page',
+				'aria-label' => '',
+				'type' => 'post_object',
+				'instructions' => 'Used for the "Back to Classes" link on the Class Type term pages.',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'post_type' => array(
+					0 => 'page',
+				),
+				'post_status' => '',
+				'taxonomy' => '',
+				'return_format' => 'id',
+				'multiple' => 0,
+				'allow_null' => 1,
+				'allow_in_bindings' => 0,
+				'bidirectional' => 0,
+				'ui' => 1,
 				'bidirectional_target' => array(
 				),
 			),

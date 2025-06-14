@@ -344,7 +344,6 @@
 				"allow_in_bindings": 0,
 				"bidirectional": 1,
 				"bidirectional_target": [
-					"field_684a24424c8f9"
 				],
 				"ui": 1
 			}
@@ -396,6 +395,33 @@
 				"allow_in_bindings": 0,
 				"bidirectional": 0,
 				"multiple": 0,
+				"bidirectional_target": []
+			},
+			{
+				"key": "field_684db56380b55",
+				"label": "Classes Page",
+				"name": "classes_page",
+				"aria-label": "",
+				"type": "post_object",
+				"instructions": "Used for the \"Back to Classes\" link on the Class Type term pages.",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"post_type": [
+					"page"
+				],
+				"post_status": "",
+				"taxonomy": "",
+				"return_format": "id",
+				"multiple": 0,
+				"allow_null": 1,
+				"allow_in_bindings": 0,
+				"bidirectional": 0,
+				"ui": 1,
 				"bidirectional_target": []
 			}
 		],

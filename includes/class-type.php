@@ -10,6 +10,15 @@ class SFE_Class_Type {
 		// List classes by category
 		add_shortcode( 'souflags_list_classes', array( $this, 'list_classes_shortcode' ) );
 		
+		// Locate a different template when displaying Class Type taxonomy term page
+		add_filter( 'taxonomy_template', array( $this, 'replace_template' ) );
+		
+		// Add a body class to make the Class Type taxonomy full width
+		add_filter( 'body_class', array( $this, 'add_class_type_body_class' ) );
+		
+		// When displaying a single term page, order the posts by the event start date
+		add_action( 'pre_get_posts', array( $this, 'order_posts_by_event_date' ) );
+		
 	}
 	
 	// Singleton instance
@@ -59,6 +68,8 @@ class SFE_Class_Type {
 			'hide_empty' => true,
 		) );
 		
+		$date_cutoff = date( 'Y-m-d H:i:s', strtotime( '-30 days' ) ); // current_time( 'mysql' )
+		
 		// Get events for each term sorted by the event start date
 		foreach( $terms as $i => $term ) {
 			$args = array(
@@ -76,7 +87,7 @@ class SFE_Class_Type {
 				'meta_query'     => array(
 					array(
 						'key'     => '_EventStartDate',
-						'value'   => current_time( 'mysql' ),
+						'value'   => $date_cutoff,
 						'compare' => '>=',
 					),
 				),
@@ -106,7 +117,7 @@ class SFE_Class_Type {
 		} );
 		
 		// Display results
-		echo '<div class="sfe-classes-list '. (empty( $terms ) ? 'no-terms' : 'has-terms') .'">';
+		echo '<div class="sfe-available-classes '. (empty( $terms ) ? 'no-terms' : 'has-terms') .'">';
 		
 		if ( empty( $terms ) ) {
 			
@@ -115,41 +126,15 @@ class SFE_Class_Type {
 		}else{
 			
 			foreach( $terms as $term ) {
-				$term_url = get_term_link( $term );
 				
 				echo '<div class="class-category term-id-' . esc_attr( $term->term_id ) . '">';
 				
-				// Display term
-				echo '<h2><a href="'. esc_url( $term_url ) .'">' . esc_html( $term->name ) . '</a></h2>';
+				// Display event title and description
+				include( SFE_PATH . '/templates/parts/term-summary.php' );
 				
-				// Display term description
-				if ( !empty( $term->description ) ) {
-					echo '<div class="class-category-description">' . wp_kses_post( $term->description ) . '</div>';
-				}
-				
-				echo '<ul class="class-post-list">';
-				
-				// Display events within the term
-				foreach( $term->posts as $post ) {
-					$start_date = get_post_meta( $post->ID, '_EventStartDate', true );
-					
-					// Display as: Jul 19
-					$start_date_monthday = $start_date ? date( 'M j', strtotime( $start_date ) ) : '';
-					$start_date_year = $start_date ? date( 'Y', strtotime( $start_date ) ) : '';
-					
-					echo '<li class="class-event post-id-' . esc_attr( $post->ID ) . '">';
-					echo '<div class="event-row">';
-					echo '<div class="event-date">';
-					echo '<div class="date">' . $start_date_monthday . '</div>';
-					if ( date( 'Y' ) !== $start_date_year ) {
-						echo '<div class="year">' . $start_date_year . '</div>';
-					}
-					echo '</div>';
-					echo '<div class="sep">&ndash;</div>';
-					echo '<a href="' . esc_url( get_permalink( $post->ID ) ) . '">' . esc_html( get_the_title( $post->ID ) ) . '</a>';
-					echo '</div>';
-					echo '</li>';
-				}
+				// Display events list assigned to this term
+				$posts = $term->posts;
+				include( SFE_PATH . '/templates/parts/event-list.php' );
 				
 				echo '</ul>';
 				
@@ -160,6 +145,63 @@ class SFE_Class_Type {
 		echo '</div>';
 		
 		return ob_get_clean();
+	}
+	
+	/**
+	 * Replace the taxonomy template for class_type
+	 *
+	 * @param string $template
+	 * @return string
+	 */
+	public function replace_template( $template ) {
+		if ( is_tax( 'class_type' ) ) {
+			return SFE_PATH . '/templates/term-class-type.php';
+		}
+		
+		return $template;
+	}
+	
+	/**
+	 * Add a body class to make the Class Type taxonomy full width
+	 * @param array $classes
+	 * @return array
+	 */
+	public function add_class_type_body_class( $classes ) {
+		if ( is_tax( 'class_type' ) ) {
+			$classes[] = 'et_full_width_page';
+		}
+		
+		return $classes;
+	}
+	
+	/**
+	 * Order posts by the event start date when displaying a single term page
+	 *
+	 * @param WP_Query $query
+	 */
+	public function order_posts_by_event_date( $query ) {
+		if ( is_admin() ) return;
+		if ( ! $query->is_main_query() ) return;
+		if ( ! $query->is_tax( 'class_type' ) ) return;
+		
+		// Exclude posts if the event start date is too long ago
+		$date_cutoff = date( 'Y-m-d H:i:s', strtotime( '-1 year' ) );
+		$query->set( 'meta_query', array(
+			array(
+				'key'     => '_EventStartDate',
+				'value'   => $date_cutoff,
+				'compare' => '>=',
+				'type'    => 'DATE',
+			),
+		) );
+		
+		// Modify the query to order by the event start date
+		$query->set( 'meta_key', '_EventStartDate' );
+		$query->set( 'orderby', 'meta_value' );
+		$query->set( 'order', 'ASC' );
+		
+		// Ensure we only get published events
+		$query->set( 'post_status', 'publish' );
 	}
 	
 }

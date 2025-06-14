@@ -164,6 +164,23 @@ class SFE_Events {
 		return $cost;
 	}
 	
+	/**
+	 * Get the stock HTML for an event
+	 *
+	 * @param int $event_post_id
+	 *
+	 * @return string
+	 */
+	public static function get_event_stock_html( $event_post_id ) {
+		$product_id = self::get_event_product_id( $event_post_id );
+		if ( ! $product_id ) return '';
+		
+		$product = wc_get_product( $product_id );
+		if ( ! $product || ! $product->exists() ) return '';
+		
+		return wc_get_stock_html( $product );
+	}
+	
 	// Actions
 	/**
 	 * Add a column to the tribe_events post type to indicate if registration is enabled
@@ -401,16 +418,11 @@ class SFE_Events {
 	 */
 	public function insert_stock_in_event_cost( $cost ) {
 		$event_post_id = get_the_ID();
-		$product_id = self::get_event_product_id( $event_post_id );
-		$product = $product_id ? wc_get_product( $product_id ) : false;
+		$stock = self::get_event_stock_html( $event_post_id );
 		
-		if ( $product ) {
-			$stock = wc_get_stock_html( $product );
+		if ( $stock ) {
 			$stock = wp_strip_all_tags( $stock );
-			
-			if ( $stock ) {
-				$cost .= ' &ndash; ' . wp_strip_all_tags( $stock );
-			}
+			$cost .= ' &ndash; ' . wp_strip_all_tags( $stock );
 		}
 		
 		return $cost;
