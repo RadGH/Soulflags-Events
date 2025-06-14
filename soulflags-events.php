@@ -6,6 +6,8 @@ Version: 1.1.5
 Author: ZingMap, Radley Sustaire
 Author URI: https://zingmap.com
 Date Created: 6/9/2025
+GitHub Plugin URI: https://github.com/RadGH/Soulflags-Events
+GitHub Branch: master
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
