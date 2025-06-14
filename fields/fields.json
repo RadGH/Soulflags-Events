@@ -1,0 +1,421 @@
+[
+	{
+		"key": "group_684c75910fae3",
+		"title": "Soulflags Events Settings - About",
+		"fields": [
+			{
+				"key": "field_684c75918e967",
+				"label": "About Soulflags Events",
+				"name": "",
+				"aria-label": "",
+				"type": "message",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "Soulflags Events allows you to create events using The Events Calendar and connect them to WooCommerce Products, allowing you to sell tickets to each event. You can also limit the number of tickets available using WooCommerce's Inventory system.\r\n\r\nTo get started, create or edit an event and enable \"Event Registrations\". Then check the box to \"Automatically create a product when this event is saved\". Fill out the rest of the event details and save the event. A product will be created automatically based off of the event.",
+				"new_lines": "wpautop",
+				"esc_html": 0
+			}
+		],
+		"location": [
+			[
+				{
+					"param": "options_page",
+					"operator": "==",
+					"value": "sfe-settings"
+				}
+			]
+		],
+		"menu_order": -10,
+		"position": "normal",
+		"style": "default",
+		"label_placement": "top",
+		"instruction_placement": "label",
+		"hide_on_screen": "",
+		"active": true,
+		"description": "Options Page: Soulflags Events",
+		"show_in_rest": 0
+	},
+	{
+		"key": "group_684a23aeac1cf",
+		"title": "Event Registration",
+		"fields": [
+			{
+				"key": "field_684a23b04c8f4",
+				"label": "Registrations",
+				"name": "sfe_registration_enabled",
+				"aria-label": "",
+				"type": "true_false",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "Enable registration using WooCommerce",
+				"default_value": 0,
+				"allow_in_bindings": 0,
+				"ui_on_text": "",
+				"ui_off_text": "",
+				"ui": 1
+			},
+			{
+				"key": "field_684a24424c8f9",
+				"label": "Product",
+				"name": "sfe_product_id",
+				"aria-label": "",
+				"type": "post_object",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"post_type": [
+					"product"
+				],
+				"post_status": "",
+				"taxonomy": "",
+				"return_format": "id",
+				"multiple": 0,
+				"allow_null": 1,
+				"allow_in_bindings": 0,
+				"bidirectional": 0,
+				"ui": 1,
+				"bidirectional_target": []
+			},
+			{
+				"key": "field_684c598e49475",
+				"label": "Create Product",
+				"name": "sfe_create_product",
+				"aria-label": "",
+				"type": "true_false",
+				"instructions": "When the event is saved a product will be created with the same name, price, and featured image.",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						},
+						{
+							"field": "field_684a24424c8f9",
+							"operator": "==empty"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "Automatically create a product when this event is saved",
+				"default_value": 0,
+				"allow_in_bindings": 0,
+				"ui": 0,
+				"ui_on_text": "",
+				"ui_off_text": ""
+			},
+			{
+				"key": "field_684c59d649477",
+				"label": "Product Settings",
+				"name": "sfe_product_settings",
+				"aria-label": "",
+				"type": "group",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						},
+						{
+							"field": "field_684a24424c8f9",
+							"operator": "==empty"
+						},
+						{
+							"field": "field_684c598e49475",
+							"operator": "==",
+							"value": "1"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"layout": "block",
+				"sub_fields": [
+					{
+						"key": "field_684c5f53d9d16",
+						"label": "Price",
+						"name": "price",
+						"aria-label": "",
+						"type": "number",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": 0,
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"default_value": "",
+						"min": 0,
+						"max": "",
+						"allow_in_bindings": 0,
+						"placeholder": "",
+						"step": "0.01",
+						"prepend": "$",
+						"append": ""
+					},
+					{
+						"key": "field_684c5f13abd8a",
+						"label": "SKU",
+						"name": "sku",
+						"aria-label": "",
+						"type": "text",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": 0,
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"default_value": "",
+						"maxlength": "",
+						"allow_in_bindings": 0,
+						"placeholder": "",
+						"prepend": "",
+						"append": ""
+					},
+					{
+						"key": "field_684c59e949478",
+						"label": "Limited Stock",
+						"name": "limited_stock",
+						"aria-label": "",
+						"type": "true_false",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": 0,
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"message": "Enable inventory limit",
+						"default_value": 0,
+						"allow_in_bindings": 0,
+						"ui": 0,
+						"ui_on_text": "",
+						"ui_off_text": ""
+					},
+					{
+						"key": "field_684c59fb49479",
+						"label": "Stock Quantity",
+						"name": "stock_quantity",
+						"aria-label": "",
+						"type": "number",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": [
+							[
+								{
+									"field": "field_684c59e949478",
+									"operator": "==",
+									"value": "1"
+								}
+							]
+						],
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"default_value": "",
+						"min": "",
+						"max": "",
+						"allow_in_bindings": 0,
+						"placeholder": "",
+						"step": "",
+						"prepend": "",
+						"append": ""
+					}
+				]
+			},
+			{
+				"key": "field_684a24d697f08",
+				"label": "Registration Details",
+				"name": "",
+				"aria-label": "",
+				"type": "message",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						},
+						{
+							"field": "field_684a24424c8f9",
+							"operator": "!=empty"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "<div class=\"sfe-event-details sfe-event-details--loading\"><p>Loading registration details&hellip;<\/p><\/div>",
+				"new_lines": "",
+				"esc_html": 0
+			}
+		],
+		"location": [
+			[
+				{
+					"param": "post_type",
+					"operator": "==",
+					"value": "tribe_events"
+				}
+			]
+		],
+		"menu_order": 0,
+		"position": "acf_after_title",
+		"style": "default",
+		"label_placement": "left",
+		"instruction_placement": "field",
+		"hide_on_screen": "",
+		"active": true,
+		"description": "Post Type: Events",
+		"show_in_rest": 0
+	},
+	{
+		"key": "group_684c747cc89c5",
+		"title": "Product: Event Registration",
+		"fields": [
+			{
+				"key": "field_684c747deba4c",
+				"label": "Event",
+				"name": "_sfe_event_id",
+				"aria-label": "",
+				"type": "post_object",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"post_type": [
+					"tribe_events"
+				],
+				"post_status": "",
+				"taxonomy": "",
+				"return_format": "id",
+				"multiple": 0,
+				"allow_null": 1,
+				"allow_in_bindings": 0,
+				"bidirectional": 1,
+				"bidirectional_target": [
+					"field_684a24424c8f9"
+				],
+				"ui": 1
+			}
+		],
+		"location": [
+			[
+				{
+					"param": "post_type",
+					"operator": "==",
+					"value": "product"
+				}
+			]
+		],
+		"menu_order": 0,
+		"position": "acf_after_title",
+		"style": "default",
+		"label_placement": "left",
+		"instruction_placement": "field",
+		"hide_on_screen": "",
+		"active": true,
+		"description": "Post Type: Products",
+		"show_in_rest": 0
+	},
+	{
+		"key": "group_684c76a964d10",
+		"title": "Soulflags Event Settings - General",
+		"fields": [
+			{
+				"key": "field_684c76a99375a",
+				"label": "Product Category",
+				"name": "product_category",
+				"aria-label": "",
+				"type": "taxonomy",
+				"instructions": "This category will be automatically assigned to products that are assigned to an event.",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"taxonomy": "product_cat",
+				"add_term": 1,
+				"save_terms": 0,
+				"load_terms": 0,
+				"return_format": "id",
+				"field_type": "select",
+				"allow_null": 1,
+				"allow_in_bindings": 0,
+				"bidirectional": 0,
+				"multiple": 0,
+				"bidirectional_target": []
+			}
+		],
+		"location": [
+			[
+				{
+					"param": "options_page",
+					"operator": "==",
+					"value": "sfe-settings"
+				}
+			]
+		],
+		"menu_order": 0,
+		"position": "normal",
+		"style": "default",
+		"label_placement": "left",
+		"instruction_placement": "field",
+		"hide_on_screen": "",
+		"active": true,
+		"description": "Options Page: Soulflags Events",
+		"show_in_rest": 0
+	}
+]

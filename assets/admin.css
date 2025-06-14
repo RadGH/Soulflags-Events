@@ -1,0 +1,28 @@
+/* Hide certain elements from the admin interface (Used in the gravity form for things like messages) */
+.sfe-hide-from-admin {
+	display: none !important;
+}
+
+/* Hide promotional text on The Events Calendar > Events page */
+#event_cost .eventBritePluginPlug {
+	display: none;
+}
+
+/* Styling for Registration Details when editing an event */
+.sfe-event-details > :first-child {
+	margin-top: 0;
+}
+
+.sfe-event-details > :last-child {
+	margin-bottom: 0;
+}
+
+/* List circle class */
+ul.ul-circle {
+	list-style-type: circle;
+}
+
+ol ul.ul-circle,
+ul ul.ul-circle {
+	margin-left: 1.8em;
+}
