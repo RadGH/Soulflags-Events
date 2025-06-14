@@ -49,9 +49,9 @@ class SFE_Plugin {
 		require_once( SFE_PATH . '/fields/fields.php' );
 		
 		// Load plugin files
+		require_once( SFE_PATH . '/includes/class-type.php' );
 		require_once( SFE_PATH . '/includes/cleanup.php' );
 		require_once( SFE_PATH . '/includes/events.php' );
-		require_once( SFE_PATH . '/includes/list-classes.php' );
 		require_once( SFE_PATH . '/includes/products.php' );
 		require_once( SFE_PATH . '/includes/registration.php' );
 		require_once( SFE_PATH . '/includes/settings.php' );

@@ -1,6 +1,6 @@
 <?php
 
-class SFE_List_Classes {
+class SFE_Class_Type {
 	
 	public function __construct() {
 		
@@ -115,10 +115,12 @@ class SFE_List_Classes {
 		}else{
 			
 			foreach( $terms as $term ) {
+				$term_url = get_term_link( $term );
+				
 				echo '<div class="class-category term-id-' . esc_attr( $term->term_id ) . '">';
 				
 				// Display term
-				echo '<h2>' . esc_html( $term->name ) . '</h2>';
+				echo '<h2><a href="'. esc_url( $term_url ) .'">' . esc_html( $term->name ) . '</a></h2>';
 				
 				// Display term description
 				if ( !empty( $term->description ) ) {
@@ -162,4 +164,4 @@ class SFE_List_Classes {
 	
 }
 
-SFE_List_Classes::get_instance();
+SFE_Class_Type::get_instance();
