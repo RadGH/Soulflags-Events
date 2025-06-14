@@ -153,3 +153,8 @@ body.et-db #et-boc footer.et-l .et_pb_row_1_tb_footer.et_pb_row {
 		margin-right: 0 !important;
 	}
 }
+
+/* Cart and Checkout - Hide product description if event name is shown */
+.wc-block-components-product-metadata:has(.wc-block-components-product-details__event) .wc-block-components-product-metadata__description {
+	display: none;
+}
