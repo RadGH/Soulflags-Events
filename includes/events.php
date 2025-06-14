@@ -93,7 +93,7 @@ class SFE_Events {
 				$display_status = ucwords(str_replace('-', ' ', $order_status));
 				$order_link = get_edit_post_link( $order_id );
 				
-				$customer_submenu = '<ul class="ul-circle"><li>' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() . ' &lt;' . $order->get_billing_email() . '&gt;</li>';
+				$customer_submenu = '<ul class="ul-circle"><li>' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() . ' &lt;' . $order->get_billing_email() . '&gt;</li></ul>';
 				
 				$message .= sprintf(
 					'<li>Order <a href="%s" target="_blank">#%d</a> (%s) &ndash; %s (%s ago) %s</li>',

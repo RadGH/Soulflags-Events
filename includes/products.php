@@ -104,6 +104,26 @@ class SFE_Products {
 		return $event_post_id;
 	}
 	
+	/**
+	 * Checks if a product is an event product
+	 * @param WC_Product|int $product
+	 * @return bool
+	 */
+	public static function is_event_product( $product ) {
+		// Get the product
+		if ( is_numeric( $product ) ) $product = wc_get_product( $product );
+		if ( ! is_a( $product, 'WC_Product' ) ) return false;
+		
+		// Check if the product is assigned the Event Product Category
+		$term_id = (int) get_field( 'product_category', 'sfe_settings' );
+		if ( ! $term_id ) return false;
+		
+		// Check if the product is assigned that term (product_cat)
+		if ( ! has_term( $term_id, 'product_cat', $product->get_id() ) ) return false;
+		
+		return true;
+	}
+	
 	// Actions
 	
 	/**

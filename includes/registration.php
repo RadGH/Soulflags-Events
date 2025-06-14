@@ -61,22 +61,25 @@ class SFE_Registration {
 	}
 	
 	/**
-	 * Get an array of order IDs that contain a specific product ID.
+	 * Get an array of order IDs for a specific event, based on the product assigned to the event.
 	 *
-	 * @see https://stackoverflow.com/a/43669138/470480
-	 *
-	 * @param int $product_id
+	 * @param int $event_post_id
 	 * @param string[]|null $order_statuses
 	 *
 	 * @return int[]
 	 */
-	public static function get_order_ids_containing_product_id( $product_id, $order_statuses = null ) {
+	public static function get_event_order_ids( $event_post_id, $order_statuses = null ) {
+		// Check if registration is enabled
+		if ( ! self::is_registration_enabled( $event_post_id ) ) return array();
+		
+		// Get assigned product ID
+		// $product_id = SFE_Events::get_event_product_id( $event_post_id );
+		// if ( !$product_id ) return array();
+		
 		global $wpdb;
 		
 		// HERE Define the orders status to include IN (each order status always starts with "wc-")
-		if ( $order_statuses === null ) {
-			$order_statuses = wc_get_is_paid_statuses();
-		}
+		if ( $order_statuses === null ) $order_statuses = wc_get_is_paid_statuses();
 		
 		// Add "wc-" prefix to each order status if it doesn't already have it
 		$order_statuses = array_map( function( $status ) {
@@ -95,44 +98,28 @@ class SFE_Registration {
 		
 		$sql = <<<MySQL
 SELECT
-    DISTINCT opl.order_id
+	DISTINCT o.id AS order_id
 
-FROM {$wpdb->prefix}wc_order_product_lookup opl
+FROM wp_wc_orders o
 
-JOIN {$wpdb->prefix}wc_orders o
-    ON opl.order_id = o.id
+JOIN wp_woocommerce_order_items oi
+	ON oi.order_id = o.id
+
+JOIN wp_woocommerce_order_itemmeta oim
+	ON oim.order_item_id = oi.order_item_id
 
 WHERE
-    o.type = 'shop_order'
+	o.type = 'shop_order'
 	AND o.status IN ( {$orders_statuses} )
-	AND ( opl.product_id = %d OR opl.variation_id = %d )
-
-ORDER BY opl.order_item_id DESC
+	AND oim.meta_key = '_sfe_event_id'
+	AND oim.meta_value = %d
 
 LIMIT 2000;
 MySQL;
 		
-		$sql = $wpdb->prepare( $sql, intval($product_id), intval($product_id) );
+		$sql = $wpdb->prepare( $sql, intval($event_post_id) );
 		
 		return $wpdb->get_col( $sql );
-	}
-	
-	/**
-	 * Get an array of order IDs for a specific event, based on the product assigned to the event.
-	 *
-	 * @param int $event_post_id
-	 *
-	 * @return int[]
-	 */
-	public static function get_event_order_ids( $event_post_id ) {
-		// Check if registration is enabled
-		if ( ! self::is_registration_enabled( $event_post_id ) ) return array();
-		
-		// Get assigned product ID
-		$product_id = SFE_Events::get_event_product_id( $event_post_id );
-		if ( !$product_id ) return array();
-		
-		return self::get_order_ids_containing_product_id( $product_id );
 	}
 	
 	/**
