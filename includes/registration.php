@@ -102,10 +102,10 @@ SELECT
 
 FROM {$wpdb->prefix}wc_orders o
 
-JOIN wp_woocommerce_order_items oi
+JOIN {$wpdb->prefix}woocommerce_order_items oi
 	ON oi.order_id = o.id
 
-JOIN wp_woocommerce_order_itemmeta oim
+JOIN {$wpdb->prefix}woocommerce_order_itemmeta oim
 	ON oim.order_item_id = oi.order_item_id
 
 WHERE
