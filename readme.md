@@ -27,6 +27,8 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 
 ## Changelog
 
-### 1.1.5
+### 1.1.6
+- Improved Class Type archive pages and added back link to customizable Classes main page
 
+### 1.1.5
 - First release
