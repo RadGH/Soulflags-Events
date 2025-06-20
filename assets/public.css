@@ -78,6 +78,18 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 	display: none;
 }
 
+.sfe-product-cart-button .cart {
+	display: grid;
+	grid-template-columns: auto auto 1fr;
+	gap: 10px;
+	align-items: center;
+}
+
+.sfe-product-cart-button input[type="number"] {
+	padding: 10px;
+	font-size: 16px;
+}
+
 /* Large button on desktop */
 @media ( min-width: 720px ) {
 	.sfe-product-cart-button .button {
@@ -223,11 +235,6 @@ body.et-db #et-boc footer.et-l .et_pb_section.footer-row-main .et_pb_image {
 	margin-bottom: 10px !important;
 }
 
-body.et-db #et-boc footer.et-l .et_pb_section.footer-row-main .et_pb_row {
-	padding-top: 80px !important;
-	padding-bottom: 40px !important;
-}
-
 footer .footer-row-main .et_pb_row .et_pb_column :where(p, ul) {
 	line-height: 1.5;
 }
@@ -243,6 +250,10 @@ footer .footer-row-main a:where(:hover, :focus-visible) {
 
 @media ( min-width: 980.1px ) {
 	body.et-db #et-boc footer.et-l .et_pb_section.footer-row-main {
+		padding-top: 0 !important;
+	}
+
+	body.et-db #et-boc footer.et-l .et_pb_section.footer-row-main .et_pb_row {
 		padding-top: 100px !important;
 		padding-bottom: 20px !important;
 	}
