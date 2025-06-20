@@ -120,7 +120,7 @@ class SFE_Cart {
 		
 		// Display link to edit tickets (Except on checkout)
 		if ( ! is_checkout()  ) {
-			$button_label = $entries ? 'Register Tickets' : 'Edit Tickets';
+			$button_label = empty($entries) ? 'Register Tickets' : 'Edit Tickets';
 			
 			$item_data[] = array(
 				'name'  => __( 'Tickets', 'soulflags-events' ),
