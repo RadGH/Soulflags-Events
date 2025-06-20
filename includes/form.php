@@ -1,6 +1,6 @@
 <?php
 
-class SFE_Cart {
+class SFE_Form {
 	
 	public function __construct() {
 		
@@ -337,4 +337,4 @@ class SFE_Cart {
 	
 }
 
-SFE_Cart::get_instance();
+SFE_Form::get_instance();
