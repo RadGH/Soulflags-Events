@@ -72,8 +72,8 @@ class SFE_Events {
 		// Add number of registrations
 		$message .= sprintf(
 			_n(
-				__( 'This event has <strong>%d</strong> registration:', 'soulflags-events' ),
-				__( 'This event has <strong>%d</strong> registrations:', 'soulflags-events' ),
+				__( 'This event has <strong>%d</strong> order:', 'soulflags-events' ),
+				__( 'This event has <strong>%d</strong> orders:', 'soulflags-events' ),
 				$details['registered_count']
 			),
 			$details['registered_count']
@@ -93,7 +93,35 @@ class SFE_Events {
 				$display_status = ucwords(str_replace('-', ' ', $order_status));
 				$order_link = get_edit_post_link( $order_id );
 				
-				$customer_submenu = '<ul class="ul-circle"><li>' . $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() . ' &lt;' . $order->get_billing_email() . '&gt;</li></ul>';
+				$customer_list = array();
+				
+				foreach( $order->get_items() as $order_item ) {
+					if ( $order_item->get_type() === 'line_item' && $order_item->get_meta( '_sfe_tickets' ) ) {
+						$tickets = $order_item->get_meta( '_sfe_tickets' );
+						
+						foreach( $tickets as $ticket_index => $ticket ) {
+							$name = isset( $ticket['name'] ) ? esc_html( $ticket['name'] ) : '';
+							$age = isset( $ticket['age'] ) ? esc_html( $ticket['age'] ) : '';
+							
+							$display_key = sprintf( __( 'Ticket #%d', 'soulflags-events' ), $ticket_index + 1 );
+							$display_label = trim( $name . ($age ? ' (age ' . $age . ')' : '') ); // Bob (age 30), John Smith (age 25)
+							
+							$customer_list[] = sprintf(
+								'%s: %s',
+								$display_key,
+								$display_label
+							);
+						}
+						break;
+					}
+				}
+				
+				// If no customers for this order
+				if ( empty($customer_list) ) {
+					$customer_submenu = '<ul class="ul-circle"><li>'. __( '(No tickets found)', 'soulflags-events' ) .'</li></ul>';
+				}else{
+					$customer_submenu = '<ul class="ul-circle"><li>' . implode( '</li><li>', $customer_list ) . '&gt;</li></ul>';
+				}
 				
 				$message .= sprintf(
 					'<li>Order <a href="%s" target="_blank">#%d</a> (%s) &ndash; %s (%s ago) %s</li>',
