@@ -27,6 +27,11 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 
 ## Changelog
 
+### 1.1.7
+- Styling updates for front page and footer
+- Use prefixed table names
+- Changed events to use a ticket system with multiple entries per quantity of items in cart
+
 ### 1.1.6
 - Improved Class Type archive pages and added back link to customizable Classes main page
 - Updated to assign events to orders by order meta
