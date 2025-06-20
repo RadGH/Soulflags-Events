@@ -172,6 +172,9 @@ class SFE_Events {
 	 * @return string
 	 */
 	public static function get_event_stock_html( $event_post_id ) {
+		// Hide stock for expired events
+		if ( self::is_event_expired( $event_post_id ) ) return 'Event expired';
+		
 		$product_id = self::get_event_product_id( $event_post_id );
 		if ( ! $product_id ) return '';
 		
@@ -179,6 +182,157 @@ class SFE_Events {
 		if ( ! $product || ! $product->exists() ) return '';
 		
 		return wc_get_stock_html( $product );
+	}
+	
+	/**
+	 * Checks if an event is expired based on its start and end date (whichever is greater). Events expire at the end of their last day.
+	 *
+	 * @param int $event_post_id
+	 * @param string|null $start_date Optional start date in Y-m-d format. If not provided, it will be fetched from post meta.
+	 * @param string|null $end_date   Optional end date in Y-m-d format. If not provided, it will be fetched from post meta.
+	 *
+	 * @return bool
+	 */
+	public static function is_event_expired( $event_post_id, $start_date = null, $end_date = null ) {
+		// If start and end dates are not provided, get them from post meta
+		if ( $end_date === null ) $end_date = get_post_meta( $event_post_id, '_EventEndDate', true );
+		if ( $start_date === null ) $start_date = get_post_meta( $event_post_id, '_EventStartDate', true );
+		
+		// Prefer to use the end date if available, otherwise use the start date
+		$date_ymd = $end_date ?: $start_date;
+		if ( ! $date_ymd ) return false; // No date, doesn't expire
+		
+		// Check if it expired at least 18 hours ago
+		// return strtotime( $date_ymd ) < strtotime( '-18 hours' );
+		return strtotime( $date_ymd ) < strtotime( '0 hours' );
+	}
+	
+	/**
+	 * Create a WooCommerce product for an event.
+	 *
+	 * @param int $event_post_id The ID of the event post.
+	 * @param float $price The price of the product.
+	 * @param string $sku The SKU for the product.
+	 * @param int $stock_quantity The stock quantity for the product.
+	 *
+	 * @return int|false The ID of the created product or false on failure.
+	 */
+	public static function create_product_for_event( $event_post_id, $price = 0.00, $sku = '', $stock_quantity = 0 ) {
+		$event_title = get_the_title( $event_post_id );
+		$event_url = get_permalink( $event_post_id );
+		$featured_image_id = get_post_thumbnail_id( $event_post_id );
+		
+		// Set up initial product metadata including the product type
+		$meta = array(
+			'_sfe_event_id' => $event_post_id, // Store the event ID in product meta
+			'_sku' => $sku,
+			'_price' => $price,
+			'_regular_price' => $price,
+			'_stock' => $stock_quantity,
+			'_manage_stock' => $stock_quantity === -1 ? 'no' : 'yes', // If stock quantity is -1, don't manage stock
+			'_stock_status' => $stock_quantity != 0 ? 'instock' : 'outofstock',
+			'_visibility' => 'hidden', // Hide from catalog
+			'_thumbnail_id' => $featured_image_id, // Store the featured image ID
+			'_virtual' => 'no', // Mark as virtual product
+			'_downloadable' => 'no', // Not downloadable
+			'_sold_individually' => 'no', // Allow multiple quantity
+			'_backorders' => 'no', // Do not allow backorders
+		);
+		
+		// Create a product associated with the event
+		$product_data = array(
+			'post_title' => $event_title,
+			'post_content' => 'Event: <a href="'. esc_url($event_url) .'">' . esc_html($event_title) . '</a>',
+			'post_status' => 'publish',
+			'post_type' => 'product',
+			'meta_input' => $meta,
+		);
+		
+		try {
+			
+			// Insert the product as a post
+			$product_id = wp_insert_post( $product_data );
+			if ( is_wp_error( $product_id ) ) throw new Exception( $product_id->get_error_message() );
+			
+			// Get product and save it again using WooCommerce to ensure all metadata is set correctly
+			$product = wc_get_product( $product_id );
+			$product->save();
+			
+			// Assign the default product category (from Soulflags Events > Product Category)
+			$category_term_id = get_field( 'product_category', 'sfe_settings' );
+			if ( $category_term_id ) wp_set_post_terms( $product_id, $category_term_id, 'product_cat' );
+			
+		}catch( Exception $e ) {
+			
+			// Handle any errors that occur while getting the product object
+			// This is used in a notice on the Event screen
+			/** @see SFE_Events::display_product_created_failed_notice() */
+			update_post_meta( $event_post_id, '_sfe_product_creation_error', $e->getMessage() );
+			return false;
+			
+		}
+		
+		return $product_id;
+	}
+	
+	/**
+	 * Get a formatted date range for an event. This date range will be succinct, only showing the year if it is different from the current year (for example).
+	 *
+	 * @param int $event_post_id
+	 * @param bool $force_year   Default false, which will hide the year if it's the same as the current year. Set to true to always display the year.
+	 * @param bool $allow_html   Default true, which will include the attribute <time datetime="..."> surrounding the date.
+	 *
+	 * @return string|false
+	 */
+	public static function get_event_date_range( $event_post_id, $force_year = false, $allow_html = true ) {
+		$event_start_date = get_post_meta( $event_post_id, '_EventStartDate', true );
+		$event_end_date = get_post_meta( $event_post_id, '_EventEndDate', true );
+		if ( ! $event_start_date && ! $event_end_date ) return false;
+		
+		// Compare the dates to see how specific we need to be
+		$end_ts = strtotime( $event_end_date );
+		$start_ts = strtotime( $event_start_date );
+		$now_ts = time();
+		
+		// Comparing year also compares to the current year
+		$diff_year = date('Y', min($end_ts, $start_ts, $now_ts)) != date('Y', max($end_ts, $start_ts, $now_ts));
+		if ( $force_year ) $diff_year = true;
+		
+		// Month and day only compare the start and end dates (not the current date)
+		$diff_month = date('F', $start_ts) != date('F', $end_ts);
+		
+		// Check if both dates are the same, in order to show just a single date.
+		$same_dates = date('Y-m-d', $start_ts) === date('Y-m-d', $end_ts);
+		
+		// Only include necessary details
+		if ( $same_dates ) {
+			// Single date display
+			if ( $diff_year ) {
+				$date_range = date_i18n( 'F j, Y', $start_ts );
+			} else {
+				$date_range = date_i18n( 'F j', $start_ts );
+			}
+		}else{
+			// Date range display
+			if ( $diff_year ) {
+				$date_range = date_i18n( 'F j, Y', $start_ts ) . ' &ndash; ' . date_i18n( 'F j, Y', $end_ts );
+			} elseif ( $diff_month ) {
+				$date_range = date_i18n( 'F j', $start_ts ) . ' &ndash; ' . date_i18n( 'F j', $end_ts );
+			} else {
+				$date_range = date_i18n( 'F j', $start_ts ) . '&ndash;' . date_i18n( 'j', $end_ts );
+			}
+		}
+		
+		if ( $allow_html ) {
+			// Add <time> HTML tag with datetime attribute
+			$date_range = sprintf(
+				'<time datetime="%s">%s</time>',
+				date( 'Y-m-d', $start_ts ),
+				$date_range
+			);
+		}
+		
+		return $date_range;
 	}
 	
 	// Actions
@@ -303,7 +457,7 @@ class SFE_Events {
 		}
 		
 		// Create the product associated with the event
-		$product_id = SFE_Products::create_product_for_event( $event_post_id, $price, $sku, $stock_quantity );
+		$product_id = self::create_product_for_event( $event_post_id, $price, $sku, $stock_quantity );
 		
 		if ( $product_id ) {
 			// Update the event post with the product ID
@@ -401,6 +555,10 @@ class SFE_Events {
 		global $event_post_id, $product_id, $product;
 		
 		$event_post_id = get_the_ID();
+		
+		// Hide add to cart button if the event is expired
+		if ( self::is_event_expired($event_post_id) ) return;
+		
 		$product_id = self::get_event_product_id( $event_post_id );
 		$product = $product_id ? wc_get_product( $product_id ) : false;
 		

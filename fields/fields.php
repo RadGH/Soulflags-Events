@@ -326,59 +326,6 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 	) );
 	
 	acf_add_local_field_group( array(
-		'key' => 'group_684c747cc89c5',
-		'title' => 'Product: Event Registration',
-		'fields' => array(
-			array(
-				'key' => 'field_684c747deba4c',
-				'label' => 'Event',
-				'name' => '_sfe_event_id',
-				'aria-label' => '',
-				'type' => 'post_object',
-				'instructions' => '',
-				'required' => 0,
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '',
-					'class' => '',
-					'id' => '',
-				),
-				'post_type' => array(
-					0 => 'tribe_events',
-				),
-				'post_status' => '',
-				'taxonomy' => '',
-				'return_format' => 'id',
-				'multiple' => 0,
-				'allow_null' => 1,
-				'allow_in_bindings' => 0,
-				'bidirectional' => 1,
-				'bidirectional_target' => array(
-				),
-				'ui' => 1,
-			),
-		),
-		'location' => array(
-			array(
-				array(
-					'param' => 'post_type',
-					'operator' => '==',
-					'value' => 'product',
-				),
-			),
-		),
-		'menu_order' => 0,
-		'position' => 'acf_after_title',
-		'style' => 'default',
-		'label_placement' => 'left',
-		'instruction_placement' => 'field',
-		'hide_on_screen' => '',
-		'active' => true,
-		'description' => 'Post Type: Products',
-		'show_in_rest' => 0,
-	) );
-	
-	acf_add_local_field_group( array(
 		'key' => 'group_684c76a964d10',
 		'title' => 'Soulflags Event Settings - General',
 		'fields' => array(

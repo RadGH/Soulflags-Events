@@ -13,8 +13,8 @@ class SFE_Settings {
 		// Include JS and CSS on the admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
 		
-		// Add options to the ACF field for "Required Order Statuses" using WooCommerce order statuses
-		// add_filter( 'acf/load_field/key=field_68362ebe34c3e', array( $this, 'acf_load_required_order_statuses' ) );
+		// Customize the admin menu pages to simplify the Events menu
+		add_action( 'admin_menu', array( $this, 'customize_admin_menu' ), 100000 );
 		
 	}
 	
@@ -87,37 +87,105 @@ class SFE_Settings {
 		}
 	}
 	
-	
 	/**
-	 * Load the WooCommerce order statuses into the ACF field for "Required Order Statuses"
+	 * Customize the admin menu pages to simplify the Events menu
 	 *
-	 * @param array $field
-	 * @return array
+	 * @return void
 	 */
-	/*
-	public function acf_load_required_order_statuses( $field ) {
-		// Ignore the ACF field group and import/export screens
-		if ( acf_is_screen('acf-field-group') ) return $field;
-		if ( acf_is_screen('acf_page_acf-tools') ) return $field;
+	public function customize_admin_menu() {
+		global $menu, $submenu;
 		
-		// Get all WooCommerce order statuses
-		$order_statuses = wc_get_order_statuses();
+		// Pages to remove:
+		// From these parents:
+		// edit.php?post_type=tribe_events
+		// tribe-common
+		//
+		// Sub-pages:       [2]
+		// Help             tec-events-help-hub
+		// Troubleshooting  tec-troubleshooting
+		// Event Add-Ons    tribe-app-shop
+		// Setup Guide      first-time-setup
 		
-		// Set the choices for the ACF field
-		$field['choices'] = array();
-		foreach ( $order_statuses as $status => $label ) {
-			// Remove the 'wc-' prefix from the status
-			if ( str_starts_with($status, 'wc-' ) ) {
-				$status = substr( $status, 3 );
+		$parents = array(
+			'edit.php?post_type=tribe_events',
+			'tribe-common',
+		);
+		
+		$remove_pages = array(
+			'tec-events-help-hub',
+			'tec-troubleshooting',
+			'tribe-app-shop',
+			'first-time-setup',
+		);
+		
+		foreach( $remove_pages as $key ) {
+			// remove_menu_page( $key );
+			foreach( $parents as $p ) {
+				remove_submenu_page( $p, $key );
 			}
-			
-			$field['choices'][ $status ] = $label;
 		}
 		
-		return $field;
 	}
-	*/
 	
+	/**
+	 * Register a rewrite rule used to display a form for an event product while it is in the cart
+	 *
+	 * @return void
+	 */
+	public function register_rewrite_rule() {
+		add_rewrite_rule(
+			"^event/?",
+			'index.php?sfe_cart_item_key=$matches[1]'
+		);
+		
+		/*
+		add_rewrite_rule(
+			"^cart/register-event/([^/]+)/?",
+			'index.php?sfe_cart_item_key=$matches[1]',
+			'top'
+		);
+		*/
+	}
+	
+	/**
+	 * Add a custom query variable to store the Cart Item Key from the URL
+	 *
+	 * @param array $vars
+	 * @return array
+	 */
+	public function add_query_vars( $vars ) {
+		$vars[] = 'sfe_cart_item_key';
+		return $vars;
+	}
+	
+	/**
+	 * If viewing the event product registration page, load our custom page template
+	 *
+	 * @param WP $wp
+	 * @return void
+	 */
+	public function maybe_display_product_registration_template( $wp ) {
+		$cart_item_key = get_query_var( 'sfe_cart_item_key' );
+		if ( ! $cart_item_key ) return;
+
+		if ( ! WC()->cart ) {
+			wp_die( 'Could not display the event product registration page: The cart is not available.', 'Cart Not Available', array( 'response' => 500, 'back_link' => true ) );
+			exit;
+		}
+		
+		$cart_item = WC()->cart->get_cart_item( $cart_item_key );
+		if ( ! $cart_item ) {
+			wp_die( 'Could not display the event product registration page: Invalid cart item specified.', 'Cart Not Available', array( 'response' => 500, 'back_link' => true ) );
+			exit;
+		}
+		
+		echo '<pre>';
+		var_dump($cart_item_key, $cart_item);
+		exit;
+
+		include SFE_PATH . '/templates/product-registration.php';
+		exit;
+	}
 	
 }
 

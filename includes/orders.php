@@ -7,6 +7,12 @@ class SFE_Orders {
 		// Remove event products from the cart if they are not assigned the required event ID in cart meta
 		add_action( 'woocommerce_check_cart_items', array( $this, 'remove_invalid_event_products_from_cart' ) );
 		
+		// Add a WooCommerce notice if an event product was removed from the cart based on the URL parameter ?sfe_removed_from_cart
+		add_action( 'et_before_main_content', array( $this, 'maybe_notify_removed_from_cart' ) );
+		
+		// Display a notice about the product being removed in The Events Calendar notices area.
+		add_filter( 'tec_events_single_event_id', array( $this, 'maybe_notify_in_the_event_calendar_notices' ), 10, 2 );
+		
 		// Prevent product from being purchasable on the single product page (you must buy it through the event page)
 		add_filter( 'woocommerce_is_purchasable', array( $this, 'prevent_product_purchase' ), 10, 2 );
 		
@@ -27,6 +33,15 @@ class SFE_Orders {
 		
 		// Display the event ID in the admin order item details.
 		add_filter( 'woocommerce_display_item_meta', array( $this, 'display_event_meta_on_order' ), 10, 3 );
+		
+		// Change "5 in stock" to "5 seats available"
+		add_filter( 'woocommerce_get_availability', array( $this, 'get_stock_availability_language' ), 10, 2 );
+		
+		// Change "Add to Cart" buttons to go directly to the checkout page
+		add_filter( 'woocommerce_add_to_cart_form_action', array( $this, 'add_to_cart_to_checkout' ) );
+		
+		// Format the event details on the admin order item meta
+		add_action( 'woocommerce_order_item_get_formatted_meta_data', array( $this, 'format_admin_event_meta' ), 15, 2 );
 		
 	}
 	
@@ -53,30 +68,97 @@ class SFE_Orders {
 	}
 	
 	/**
+	 * Checks if a product is an event product
+	 * @param WC_Product|int $product
+	 * @return bool
+	 */
+	public static function is_event_product( $product ) {
+		// Get the product
+		if ( is_numeric( $product ) ) $product = wc_get_product( $product );
+		if ( ! is_a( $product, 'WC_Product' ) ) return false;
+		
+		// Check if the product is assigned the Event Product Category
+		$term_id = (int) get_field( 'product_category', 'sfe_settings' );
+		if ( ! $term_id ) return false;
+		
+		// Check if the product is assigned that term (product_cat)
+		if ( ! has_term( $term_id, 'product_cat', $product->get_id() ) ) return false;
+		
+		return true;
+	}
+	
+	/**
 	 * Check if an event product is in the cart and returns the event ID if it is.
-	 * @param WC_Product|int $product_id The product ID to check.
-	 * @return array|false {
+	 *
+	 * @param int[]|null $product_ids The product ID(s) to look for. Default null, which checks for any event products.
+	 *
+	 * @return array[]|null {
 	 *     @type string $cart_item_key
+	 *     @type array $cart_item
 	 *     @type int $product_id
 	 *     @type int $event_post_id
+	 *     @type int $quantity
 	 * }
 	 */
-	public function get_event_product_from_cart( $product_id ) {
+	public static function get_event_products_from_cart( $product_ids = null ) {
 		if ( ! WC()->cart ) return null;
 		
-		if ( $product_id instanceof WC_Product ) {
-			$product_id = $product_id->get_id();
-		}
+		$event_products = array();
 		
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( isset( $cart_item['product_id'] ) && $cart_item['product_id'] === $product_id ) {
+			$cart_product_id = $cart_item['product_id'] ?? false;
+			if ( ! $cart_product_id ) continue;
+			
+			$check_item = ( $product_ids === null || in_array( (int) $cart_product_id, $product_ids, true ) );
+			
+			if ( $check_item ) {
 				if ( isset( $cart_item['sfe_event_id'] ) && is_numeric( $cart_item['sfe_event_id'] ) ) {
-					return array(
+					$event_products[ $cart_item['key'] ] = array(
 						'cart_item_key' => $cart_item['key'],
-						'product_id' => $product_id,
+						'cart_item' => &$cart_item, // By reference
+						'product_id' => $cart_product_id,
 						'event_post_id' => (int) $cart_item['sfe_event_id'],
+						'quantity' => $cart_item['quantity'] ?? 1,
 					);
 				}
+			}
+		}
+		
+		return $event_products;
+	}
+	
+	/**
+	 * Gets an event product from the cart by its cart item key. Returns false if invalid or not an event product.
+	 *
+	 * @param string $cart_item_key
+	 *
+	 * @return array|false {
+	 *     @type string $cart_item_key
+	 *     @type array $cart_item
+	 *     @type int $product_id
+	 *     @type int $event_post_id
+	 *     @type int $quantity
+	 * }
+	 */
+	public static function get_event_product_from_cart_by_key( $cart_item_key ) {
+		if ( ! WC()->cart ) return null;
+		
+		$cart_item = WC()->cart->get_cart_item( $cart_item_key );
+		
+		if ( $cart_item ) {
+			$cart_product_id = $cart_item['product_id'] ?? false;
+			if ( ! $cart_product_id ) return false;
+			
+			if ( ! self::is_event_product( $cart_product_id ) ) return false;
+			
+			if ( isset( $cart_item['sfe_event_id'] ) && is_numeric( $cart_item['sfe_event_id'] ) ) {
+				return array(
+					'cart_item_key' => $cart_item_key,
+					'cart_item' => $cart_item,
+					'product_id' => $cart_product_id,
+					'event_post_id' => (int) $cart_item['sfe_event_id'],
+					'quantity' => $cart_item['quantity'] ?? 1,
+				);
 			}
 		}
 		
@@ -93,32 +175,147 @@ class SFE_Orders {
 	public function remove_invalid_event_products_from_cart() {
 		$cart_items = WC()->cart->get_cart();
 		
-		// Loop through each product
-		// Check if the product is an event product
-		// If it is, check that it contains an event id
-		// If no event id, remove from cart with message that you must buy it through the event page
+		// Variables to track removed items
+		$redirect_url = false;
+		$removed_event_id = false;
+		$removed_reason = false;
 		
+		// Iterate through cart items
 		if ( $cart_items ) foreach ( $cart_items as $key => $cart_item ) {
 			$product_id = $cart_item['product_id'] ?? false;
 			if ( ! $product_id ) continue;
-			if ( ! SFE_Products::is_event_product( $product_id ) ) continue;
 			
-			$event_post_id = $cart_item['sfe_event_id'] ?? false;
+			// Only check event products
+			if ( ! self::is_event_product( $product_id ) ) continue;
 			
-			if ( ! $event_post_id ) {
+			try {
+				
+				// Get the event ID from cart meta (required)
+				$event_post_id = $cart_item['sfe_event_id'] ?? false;
+				
+				// Check if event is valid
+				if ( ! $event_post_id || get_post_type( $event_post_id ) !== 'tribe_events' ) {
+					throw new Exception('invalid_event');
+				}
+				
+				// Check if the event is expired
+				if ( SFE_Events::is_event_expired( $event_post_id ) ) {
+					throw new Exception('event_expired');
+				}
+				
+			} catch ( Exception $e ) {
+				
+				// If an exception was thrown, it means the event is invalid or expired and the product should be removed from the cart
+				$removed_event_id = $event_post_id;
+				$removed_reason = $e->getMessage();
+				
 				// Remove the item from the cart if it does not match
 				wc()->cart->remove_cart_item( $key );
 				
-				// Add a notice to the cart
-				$message = sprintf(
-					__( '<strong>%s</strong>: You must purchase this product through the event page.', 'soulflags-events' ),
-					get_the_title( $product_id )
-				);
-				wc_add_notice( $message, 'error' );
+				// If the event post id was provided, redirect to that page after
+				if ( $removed_event_id ) {
+					$redirect_url = get_permalink( $removed_event_id );
+					$redirect_url = add_query_arg( 'sfe_removed_from_cart', $removed_event_id, $redirect_url );
+					$redirect_url = add_query_arg( 'sfe_removed_reason', $removed_reason, $redirect_url );
+				}
+				
 			}
 		}
 		
+		// If a product was removed, display a notice or redirect
+		if ( $removed_event_id ) {
+			if ( $redirect_url ) {
+				// Redirect to the event page, which will display a notice
+				/** @see SFE_Orders::maybe_notify_removed_from_cart() */
+				wp_redirect( $redirect_url );
+				exit;
+			}else{
+				// Display a notice
+				wc_add_notice(
+					self::get_event_removed_from_cart_message( $removed_event_id, $removed_reason ),
+					'error'
+				);
+				
+				wc_print_notices();
+			}
+		}
+	}
+	
+	/**
+	 * Gets a string message to be displayed when an event product is removed from the cart.
+	 *
+	 * @param int $event_post_id
+	 * @param string $reason_code One of: invalid_event, event_expired
+	 *
+	 * @return string
+	 */
+	public static function get_event_removed_from_cart_message( $event_post_id, $reason_code ) {
+		switch( $reason_code ) {
+			case 'invalid_event':
+				$message = __( 'You must purchase this product through the event page.', 'soulflags-events' );
+				break;
+				
+			case 'event_expired':
+			default:
+				$message = __( 'This event is no longer available '. $reason_code .'.', 'soulflags-events' );
+				break;
+		}
+		
+		return sprintf(
+			'<strong>%s removed from cart:</strong> %s',
+			get_the_title( $event_post_id ),
+			esc_html( $message )
+		);
+	}
+	
+	/**
+	 * Adds a notice if an event product was removed from the cart based on the URL parameter ?sfe_removed_from_cart
+	 * @return void
+	 */
+	public function maybe_notify_removed_from_cart() {
+		if ( ! isset( $_GET['sfe_removed_from_cart'] ) ) return;
+		
+		// Do not display this notice on a single event page (use the event calendar notices instead)
+		if ( is_singular( 'tribe_events' ) ) return;
+		
+		$event_post_id = intval( $_GET['sfe_removed_from_cart'] );
+		$reason = sanitize_text_field( $_GET['sfe_removed_reason'] );
+		if ( ! $event_post_id ) return;
+		
+		$message = self::get_event_removed_from_cart_message( $event_post_id, $reason );
+		
+		// Add a notice to be displayed
+		wc_add_notice(
+			$message,
+			'error'
+		);
+		
 		wc_print_notices();
+	}
+	
+	/**
+	 * Display a notice about the product being removed in The Events Calendar notices area.
+	 *
+	 * @param int $event_post_id
+	 *
+	 * @return int
+	 */
+	public function maybe_notify_in_the_event_calendar_notices( $event_post_id ) {
+		if ( ! isset( $_GET['sfe_removed_from_cart'] ) ) return $event_post_id;
+		
+		$removed_event_id = intval( $_GET['sfe_removed_from_cart'] );
+		if ( $removed_event_id !== $event_post_id ) return $event_post_id;
+		
+		// Get the reason for removal
+		$reason = sanitize_text_field( $_GET['sfe_removed_reason'] );
+		
+		// Get the message
+		$message = self::get_event_removed_from_cart_message( $event_post_id, $reason );
+		
+		// Add a notice to The Events Calendar
+		Tribe__Notices::set_notice( 'sfe_event_removed_from_cart', $message );
+		
+		return $event_post_id;
 	}
 	
 	/**
@@ -128,7 +325,7 @@ class SFE_Orders {
 	 * @return bool
 	 */
 	public function prevent_product_purchase( $is_purchasable, $product ) {
-		if ( ! SFE_Products::is_event_product( $product ) ) return $is_purchasable;
+		if ( ! self::is_event_product( $product ) ) return $is_purchasable;
 		
 		// Prevent purchase on the single product page
 		if ( is_product() && did_action( 'woocommerce_before_single_product' ) ) return false;
@@ -143,7 +340,7 @@ class SFE_Orders {
 	public function add_event_id_field() {
 		global $product;
 		if ( ! isset($product) ) return;
-		if ( ! SFE_Products::is_event_product( $product ) ) return;
+		if ( ! self::is_event_product( $product ) ) return;
 		
 		$event_post_id = $this->get_current_event_id();
 		
@@ -160,7 +357,7 @@ class SFE_Orders {
 	 * @return array The modified cart item data.
 	 */
 	public function add_event_id_to_cart_item_data( $cart_item_data, $product_id ) {
-		if ( ! SFE_Products::is_event_product( $product_id ) ) return $cart_item_data;
+		if ( ! self::is_event_product( $product_id ) ) return $cart_item_data;
 		
 		// Get the event ID from the hidden field
 		if ( isset( $_POST['sfe_event_id'] ) && is_numeric( $_POST['sfe_event_id'] ) ) {
@@ -175,13 +372,15 @@ class SFE_Orders {
 	
 	/**
 	 * Displays the event ID in the cart item data on the cart page.
+	 *
 	 * @param array $item_data The item data.
 	 * @param array $cart_item The cart item.
-	 * @return array The modified item data.
+	 *
+	 * @return array
 	 */
 	function display_cart_meta( $item_data, $cart_item ) {
 		$product_id = $cart_item['product_id'] ?? false;
-		if ( ! SFE_Products::is_event_product( $product_id ) ) return $item_data;
+		if ( ! self::is_event_product( $product_id ) ) return $item_data;
 		
 		$event_post_id = (int) $cart_item['sfe_event_id'];
 		if ( ! $event_post_id ) return $item_data;
@@ -190,6 +389,21 @@ class SFE_Orders {
 			'name' => __( 'Event', 'soulflags-events' ),
 			'value' => get_the_title( $event_post_id ),
 		);
+		
+		// Display the event date
+		$event_date_range = SFE_Events::get_event_date_range( $event_post_id );
+		
+		if ( $event_date_range ) {
+			$item_data[] = array(
+				'name' => __( 'Event Date', 'soulflags-events' ),
+				'value' => $event_date_range,
+			);
+		} else {
+			$item_data[] = array(
+				'name' => __( 'Event Date', 'soulflags-events' ),
+				'value' => __( '(Not specified)', 'soulflags-events' ),
+			);
+		}
 		
 		return $item_data;
 	}
@@ -253,6 +467,93 @@ class SFE_Orders {
 		}
 		
 		return $html;
+	}
+	
+	/**
+	 * Change "5 in stock" to "5 seats available"
+	 *
+	 * @param $availability
+	 * @param $_product
+	 *
+	 * @return mixed
+	 */
+	public function get_stock_availability_language( $availability, $_product = false ) {
+		if ( ! self::is_event_product( $_product->get_id() ) ) return $availability;
+		
+		$labels = array(
+			'in stock' => __( 'seats available', 'soulflags-events' ),
+		);
+		
+		$availability['availability'] = str_replace( array_keys( $labels ), array_values( $labels ), $availability['availability'] );
+		$availability['availability'] = str_replace( '1 seats available', '1 seat available', $availability['availability'] );
+		
+		return $availability;
+	}
+	
+	/**
+	 * Change "Add to Cart" buttons to go directly to the checkout page
+	 * @param string $action
+	 * @return string
+	 */
+	public function add_to_cart_to_checkout( $action ) {
+		return wc_get_checkout_url();
+	}
+	
+	/**
+	 * Format the event details on the admin order item meta
+	 *
+	 * @param object[] $formatted_meta
+	 * @param WC_Order_Item $order_item
+	 * @return array
+	 */
+	public function format_admin_event_meta( $formatted_meta, $order_item ) {
+		if ( ! is_admin() ) return $formatted_meta;
+		
+		$product_id = $order_item->get_product_id();
+		if ( ! SFE_Orders::is_event_product( $product_id ) ) return $formatted_meta;
+		
+		$event_post_id = $order_item->get_meta( '_sfe_event_id' ) ?? false;
+		
+		$display_title = $order_item->get_meta( '_sfe_event_title' ) ?? false;
+		$display_event_date = $order_item->get_meta( '_sfe_event_start_date' ) ?? false;
+		
+		// Remove default meta
+		foreach( $formatted_meta as $i => $m ) {
+			$key = $m->key ?? '';
+			
+			if ( in_array( $key, array('_sfe_event_id', '_sfe_event_title', '_sfe_event_start_date'), true ) ) {
+				unset( $formatted_meta[ $i ] );
+			}
+		}
+		
+		if ( get_post_type( $event_post_id ) == 'tribe_events' ) {
+			$display_title = get_the_title( $event_post_id );
+			$display_title .= ' (<a href="'. get_edit_post_link( $event_post_id ).'">Edit</a>)';
+			$display_event_date = SFE_Events::get_event_date_range( $event_post_id, true );
+		}
+		
+		$formatted_meta[] = (object) array(
+			'key'           => '_sfe_event_id',
+			'value'         => '',
+			'display_key'   => __( 'Event ID', 'soulflags-events' ),
+			'display_value' => $event_post_id,
+		);
+		
+		$formatted_meta[] = (object) array(
+			'key'           => '_sfe_event_title',
+			'value'         => '',
+			'display_key'   => __( 'Event Title', 'soulflags-events' ),
+			'display_value' => $display_title,
+		);
+		
+		$formatted_meta[] = (object) array(
+			'key'           => '_sfe_event_start_date',
+			'value'         => '',
+			'display_key'   => __( 'Event Date', 'soulflags-events' ),
+			'display_value' => $display_event_date,
+		);
+		
+		return $formatted_meta;
 	}
 	
 }

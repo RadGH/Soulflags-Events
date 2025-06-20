@@ -28,7 +28,7 @@ if ( ! $product->is_purchasable() ) {
 				&ndash;
 			</div>
 			<div class="product-stock">
-				<?php echo wc_get_stock_html( $product ); ?>
+				<?php echo SFE_Events::get_event_stock_html( $event_post_id ); ?>
 			</div>
 			<?php
 		}

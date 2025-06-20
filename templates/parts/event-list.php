@@ -8,26 +8,14 @@
 echo '<div class="sfe-classes-list '. (empty( $posts ) ? 'no-posts' : 'has-posts') .'">';
 
 foreach( $posts as $post ) {
-	$start_date = get_post_meta( $post->ID, '_EventStartDate', true );
-	$end_date = get_post_meta( $post->ID, '_EventEndDate', true );
-	
-	// Display as: Jul 19
-	$start_ts = strtotime( $start_date );
-	$start_date_monthday = $start_date ? date( 'M j', $start_ts ) : '';
-	$start_date_year = $start_date ? date( 'Y', $start_ts ) : '';
-	
-	$end_ts = strtotime( $end_date );
-	$end_date_monthday = $end_date ? date( 'M j', $end_ts ) : '';
-	$end_date_year = $end_date ? date( 'Y', $end_ts ) : '';
-	
-	$display_both_days = ($start_date_monthday . $start_date_year) !== ($end_date_monthday . $end_date_year);
-	
 	// Check if expired, meaning the start date is in the past
-	$max_date = $end_ts ?: $start_ts;
-	$is_expired = $max_date && $max_date < time();
+	$is_expired = SFE_Events::is_event_expired( $post->ID );
 	
 	// Get the event title
 	$event_title = get_the_title( $post->ID );
+	
+	// Get the formatted event date
+	$event_date_range = SFE_Events::get_event_date_range( $post->ID );
 	
 	// Get the event cost and stock, separated by en dash
 	$cost = array(
@@ -44,12 +32,30 @@ foreach( $posts as $post ) {
 	
 	echo '<li class="' . esc_attr( $classes ) . '">';
 	
-	echo '<div class="event-row '. ($display_both_days ? 'two-dates' : 'one-date') .'">';
+	echo '<div class="event-row">';
 	
-	if ( $is_expired ) {
-		echo '<span class="expired-label">' . esc_html__( 'Expired', 'soulflags-events' ) . '</span>';
-		echo '<div class="sep expired-sep">&ndash;</div>';
+	echo '<div class="event-date start-date">';
+	if ( $event_date_range ) {
+		echo '<div class="date">' . $event_date_range . '</div>';
+	} else {
+		echo '<div class="date">(No date)</div>';
 	}
+	echo '</div>';
+	
+	/*
+	$start_date = get_post_meta( $post->ID, '_EventStartDate', true );
+	$end_date = get_post_meta( $post->ID, '_EventEndDate', true );
+	
+	// Display as: Jul 19
+	$start_ts = strtotime( $start_date );
+	$start_date_monthday = $start_date ? date( 'M j', $start_ts ) : '';
+	$start_date_year = $start_date ? date( 'Y', $start_ts ) : '';
+	
+	$end_ts = strtotime( $end_date );
+	$end_date_monthday = $end_date ? date( 'M j', $end_ts ) : '';
+	$end_date_year = $end_date ? date( 'Y', $end_ts ) : '';
+	
+	$display_both_days = ($start_date_monthday . $start_date_year) !== ($end_date_monthday . $end_date_year);
 	
 	echo '<div class="event-date start-date">';
 	echo '<div class="date">' . $start_date_monthday . '</div>';
@@ -68,6 +74,7 @@ foreach( $posts as $post ) {
 		}
 		echo '</div>';
 	}
+	*/
 	
 	echo '<div class="sep title-sep">&ndash;</div>';
 	
