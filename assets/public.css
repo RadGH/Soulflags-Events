@@ -8,6 +8,7 @@
 	background: #dedede !important;
 	border: 2px solid #dedede !important;
 	color: #000 !important;
+	box-shadow: none !important;
 }
 
 .button:where(:hover, :focus-visible):not([disabled]) {
@@ -272,7 +273,7 @@ footer .footer-row-main a:where(:hover, :focus-visible) {
 	footer .footer-row-main .et_pb_row .et_pb_column {
 		margin: 0;
 		padding: 0;
-		width: auto;
+		width: auto !important;
 	}
 
 	body.et-db #et-boc footer.et-l .footer-row-main .et_pb_row::after {
@@ -281,6 +282,10 @@ footer .footer-row-main a:where(:hover, :focus-visible) {
 
 	footer .footer-row-main .et_pb_row .et_pb_column ul li {
 		margin-top: 5px;
+	}
+
+	footer .footer-row-main .et_pb_row .et_pb_column ul li a {
+		white-space: nowrap;
 	}
 
 	footer .footer-row-main .et_pb_row .et_pb_column:not(:first-child) {
@@ -360,4 +365,9 @@ h2.ticket-entry-title {
 		padding: 12px;
 		font-size: 16px;
 	}
+}
+
+/* General form styling */
+.gform_fields .gfield.gfield--type-section:not(:first-child) {
+	margin-top: 40px;
 }
