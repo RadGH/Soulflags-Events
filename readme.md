@@ -27,6 +27,12 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 
 ## Changelog
 
+### 1.1.8
+- General styling
+- Updated "Registration Details" to include ticket names and ages
+- Renamed SFE_Cart -> SFE_Form
+- Fixed label of cart meta
+
 ### 1.1.7
 - Styling updates for front page and footer
 - Use prefixed table names
