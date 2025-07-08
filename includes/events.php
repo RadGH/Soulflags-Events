@@ -38,6 +38,9 @@ class SFE_Events {
 		// Add Add to Cart button on calendar list view
 		add_action( 'tec_events_view_venue_after_address', array( $this, 'insert_add_to_cart_button_on_event' ), 20 );
 		
+		// Use a default venue from the Soulflags settings page
+		add_filter( 'tribe_get_venue_id', array( $this, 'get_default_venue' ), 10, 2 );
+		
 	}
 	
 	// Singleton instance
@@ -210,6 +213,25 @@ class SFE_Events {
 		if ( ! $product || ! $product->exists() ) return '';
 		
 		return wc_get_stock_html( $product );
+	}
+	
+	/**
+	 * Gets stock html based on woocommerce templates/single-product/stock.php
+	 *
+	 * @param int $amount
+	 *
+	 * @return string
+	 */
+	public static function get_stock_html( $amount, $in_stock_label = '%d in stock', $out_of_stock_label = 'Out of stock' ) {
+		$class = $amount > 0 ? 'in-stock' : 'out-of-stock';
+		
+		if ( $amount > 0 ) {
+			$label = __( $in_stock_label, 'soulflags-events' );
+		}else{
+			$label = __( $out_of_stock_label, 'soulflags-events' );
+		}
+		
+		return '<p class="stock '. esc_attr( $class ) .'">'. sprintf( $label, $amount ) .'</p>';
 	}
 	
 	/**
@@ -612,6 +634,26 @@ class SFE_Events {
 		}
 		
 		return $cost;
+	}
+	
+	/**
+	 * Use a default venue from the Soulflags settings page
+	 *
+	 * @param int|false $venue_id The Venue ID for the specified event.
+	 * @param int $post_id The ID of the event whose venue is being looked for.
+	 *
+	 * @return int|false
+	 */
+	public function get_default_venue( $venue_id, $post_id = null ) {
+		// Keep pre-defined venue
+		if ( $venue_id ) return $venue_id;
+		
+		// Only apply to events with registrations enabled
+		if ( ! SFE_Registration::is_registration_enabled( $post_id ) ) return $venue_id;
+		
+		$default_venue_id = get_field( 'default_venue', 'sfe_settings' );
+		
+		return $default_venue_id ?: false;
 	}
 	
 }

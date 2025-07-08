@@ -1,9 +1,13 @@
 /* Buttons */
 .button {
 	display: inline-block;
-	padding: 6px 14px;
+	padding: 10px 14px;
 	cursor: pointer;
 	border-radius: 3px;
+	appearance: none;
+
+	font-size: 14px;
+	line-height: 1;
 
 	background: #dedede !important;
 	border: 2px solid #dedede !important;
@@ -17,18 +21,21 @@
 	color: #000 !important;
 }
 
+.button.button-primary,
 .button.alt {
 	background: #003049 !important;
 	border: 2px solid #003049 !important;
 	color: #fff !important;
 }
 
+.button.button-primary:where(:hover, :focus-visible):not([disabled]),
 .button.alt:where(:hover, :focus-visible):not([disabled]) {
 	background: #264f64 !important;
 	border: 2px solid #264f64 !important;
 	color: #fff !important;
 }
 
+.button[disabled],
 .button.disabled {
 	opacity: 0.75;
 	cursor: not-allowed;
@@ -137,6 +144,7 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 .sfe-classes-list {
 	margin-top: 10px;
 	margin-left: 20px;
+	overflow: hidden;
 }
 
 .sfe-classes-list .event-row {
@@ -316,6 +324,40 @@ form.sfe-registration-form {
 	max-width: 600px;
 }
 
+.sfe-event-summary h3 a {
+	text-decoration: underline;
+}
+
+.sfe-event-summary .event-meta {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+/* - Modal boxes */
+.sfe-modal {
+	margin: 30px 0;
+	padding: 18px 12px;
+	background: #eee;
+}
+
+.sfe-modal .sfe-modal-heading > * {
+	font-size: 18px;
+	margin: 0;
+}
+
+.sfe-modal-content {
+	background: #fff;
+	padding: 12px 12px;
+}
+
+.sfe-modal-content .sfe-ticket-list {
+	gap: 10px;
+}
+
+/* - Form fields */
+
 .sfe-form-fields {
 	display: flex;
 	flex-direction: column;
@@ -334,15 +376,16 @@ form.sfe-registration-form {
 	line-height: 1.35;
 }
 
-.sfe-form-fields .prereq.required {
+.sfe-form-fields .prereq {
+	font-weight: 400;
+	font-size: 14px;
 }
 
-.sfe-form-fields .prereq.optional {
-	font-weight: 400;
+.sfe-form-fields .prereq.required {
+	color: #a30000;
 }
 
 .sfe-ticket-list {
-	margin: 30px 0;
 	display: flex;
 	flex-direction: column;
 	gap: 30px;
@@ -370,4 +413,35 @@ h2.ticket-entry-title {
 /* General form styling */
 .gform_fields .gfield.gfield--type-section:not(:first-child) {
 	margin-top: 40px;
+}
+
+/* The Events Calendar Meta - Fit content width */
+@supports ( width: fit-content ) {
+	.tribe-events-event-meta .tribe-events-meta-group {
+		width: fit-content;
+	}
+}
+
+/* The Events Calendar - Move featured image float left to content */
+.sfe-available-classes .sfe-term-featured-image,
+.tribe-events-content .tribe-events-event-image {
+	float: left;
+	max-width: clamp( 120px, 20vw, 200px );
+	margin: 0 15px 5px 0;
+}
+
+.sfe-available-classes .class-category::after,
+.tribe-events-content::after {
+	content: '';
+	display: table;
+	clear: both;
+}
+
+/* The Events Calendar - Featured image (list view) */
+article.tribe-events-calendar-list__event:has(.tribe-events-calendar-list__event-featured-image-wrapper) {
+	justify-content: space-between !important;
+}
+
+article.tribe-events-calendar-list__event .tribe-events-calendar-list__event-featured-image-wrapper {
+	max-width: 200px;
 }

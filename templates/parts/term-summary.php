@@ -7,6 +7,15 @@
 $term_url = get_term_link( $term );
 $is_singular_term = is_tax( 'class_type' );
 
+$featured_image_id = get_field( 'default_featured_image_id', 'class_type_' . $term->term_id );
+if ( ! $featured_image_id ) $featured_image_id = get_field( 'default_featured_image_id', 'sfe_settings' );
+
+if ( $featured_image_id ) {
+	echo '<div class="sfe-term-featured-image">';
+	echo wp_get_attachment_image( $featured_image_id, 'large', false, array( 'class' => 'sfe-term-featured-image__img' ) );
+	echo '</div>';
+}
+
 echo '<div class="sfe-term-summary">';
 
 // Display term title
@@ -14,7 +23,7 @@ if ( $is_singular_term ) {
 	echo '<h1 class="entry-title main_title">';
 } else {
 	echo '<h2 class="entry-title">';
-	echo '<a href="'. esc_url( $term_url ) .'">';
+	// echo '<a href="'. esc_url( $term_url ) .'">';
 }
 
 echo esc_html( $term->name );
@@ -22,7 +31,7 @@ echo esc_html( $term->name );
 if ( $is_singular_term ) {
 	echo '</h1>';
 } else {
-	echo '</a>';
+	// echo '</a>';
 	echo '</h2>';
 }
 

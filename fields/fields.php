@@ -75,6 +75,39 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 				'ui' => 1,
 			),
 			array(
+				'key' => 'field_686d8855db574',
+				'label' => 'Instructions',
+				'name' => '',
+				'aria-label' => '',
+				'type' => 'message',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => array(
+					array(
+						array(
+							'field' => 'field_684a23b04c8f4',
+							'operator' => '==',
+							'value' => '1',
+						),
+					),
+				),
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'message' => 'With event registration enabled, the following fields will automatically be imported from the assigned Class Type if you leave them blank:
+
+<ul class="ul-disc">
+<li>Post Content</li>
+<li>Featured Image</li>
+<li>Venue</li>
+<li>Price</li>
+</ul>',
+				'new_lines' => '',
+				'esc_html' => 0,
+			),
+			array(
 				'key' => 'field_684a24424c8f9',
 				'label' => 'Product',
 				'name' => 'sfe_product_id',
@@ -384,6 +417,60 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 				'bidirectional_target' => array(
 				),
 			),
+			array(
+				'key' => 'field_686d7d5c35190',
+				'label' => 'Default Featured Image',
+				'name' => 'default_featured_image_id',
+				'aria-label' => '',
+				'type' => 'image',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'return_format' => 'id',
+				'library' => 'all',
+				'min_width' => '',
+				'min_height' => '',
+				'min_size' => '',
+				'max_width' => '',
+				'max_height' => '',
+				'max_size' => '',
+				'mime_types' => '',
+				'allow_in_bindings' => 0,
+				'preview_size' => 'medium',
+			),
+			array(
+				'key' => 'field_686d7d6b35191',
+				'label' => 'Default Venue',
+				'name' => 'default_venue',
+				'aria-label' => '',
+				'type' => 'post_object',
+				'instructions' => 'If an event is not assigned to a venue, this one will be used instead',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'post_type' => array(
+					0 => 'tribe_venue',
+				),
+				'post_status' => '',
+				'taxonomy' => '',
+				'return_format' => 'id',
+				'multiple' => 0,
+				'allow_null' => 1,
+				'allow_in_bindings' => 0,
+				'bidirectional' => 0,
+				'ui' => 1,
+				'bidirectional_target' => array(
+				),
+			),
 		),
 		'location' => array(
 			array(
@@ -404,4 +491,56 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 		'description' => 'Options Page: Soulflags Events',
 		'show_in_rest' => 0,
 	) );
+	
+	acf_add_local_field_group( array(
+		'key' => 'group_686d79fb1159a',
+		'title' => 'Event Type Details',
+		'fields' => array(
+			array(
+				'key' => 'field_686d79fd27e57',
+				'label' => 'Default Featured Image',
+				'name' => 'default_featured_image_id',
+				'aria-label' => '',
+				'type' => 'image',
+				'instructions' => '',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'return_format' => 'id',
+				'library' => 'all',
+				'min_width' => '',
+				'min_height' => '',
+				'min_size' => '',
+				'max_width' => '',
+				'max_height' => '',
+				'max_size' => '',
+				'mime_types' => '',
+				'allow_in_bindings' => 0,
+				'preview_size' => 'medium',
+			),
+		),
+		'location' => array(
+			array(
+				array(
+					'param' => 'taxonomy',
+					'operator' => '==',
+					'value' => 'class_type',
+				),
+			),
+		),
+		'menu_order' => 0,
+		'position' => 'normal',
+		'style' => 'default',
+		'label_placement' => 'top',
+		'instruction_placement' => 'label',
+		'hide_on_screen' => '',
+		'active' => true,
+		'description' => 'Taxonomy: Events > Class Types',
+		'show_in_rest' => 0,
+	) );
+	
 } );

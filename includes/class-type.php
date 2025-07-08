@@ -19,6 +19,12 @@ class SFE_Class_Type {
 		// When displaying a single term page, order the posts by the event start date
 		add_action( 'pre_get_posts', array( $this, 'order_posts_by_event_date' ) );
 		
+		// Use the content from the associated Class Type if the content is empty for an event
+		add_filter( 'the_content', array( $this, 'use_class_type_content' ), 10, 2 );
+		
+		// Use the featured image from the Class Type or settings page if the event has none
+		add_filter( 'post_thumbnail_id', array( $this, 'use_class_type_image' ), 10, 2 );
+		
 	}
 	
 	// Singleton instance
@@ -202,6 +208,78 @@ class SFE_Class_Type {
 		
 		// Ensure we only get published events
 		$query->set( 'post_status', 'publish' );
+	}
+	
+	/**
+	 * Use the content from the associated Class Type if the content is empty for an event
+	 *
+	 * @param string $content
+	 * @param WP_Post|null $post
+	 * @return string
+	 */
+	public function use_class_type_content( $content, $post = null ) {
+		if ( $post === null ) $post = get_post();
+		
+		if ( ! is_singular( 'tribe_events' ) ) return $content;
+		
+		// Only apply to events with registrations enabled
+		if ( ! SFE_Registration::is_registration_enabled( $post->ID ) ) return $content;
+		
+		// If the event already has content, use that
+		if ( ! empty( $content ) ) return $content;
+		
+		// If the event does not have content but it has a class type, use the class type description
+		$class_types = get_the_terms( $post->ID, 'class_type' );
+		if ( ! $class_types || is_wp_error( $class_types ) ) return $content;
+		
+		// Use the content from the first term
+		$term = reset( $class_types );
+		
+		if ( ! empty( $term->description ) ) {
+			// Temporarily remove the filter to avoid infinite loop
+			remove_filter( 'the_content', array( $this, 'use_class_type_content' ), 10, 2 );
+			
+			$content = apply_filters( 'the_content', $term->description );
+			
+			add_filter( 'the_content', array( $this, 'use_class_type_content' ), 10, 2 );
+		}
+		
+		return $content;
+	}
+	
+	/**
+	 * Use the featured image from the Class Type or settings page if the event has none
+	 *
+	 * @param int|false        $thumbnail_id Post thumbnail ID or false if the post does not exist.
+	 * @param int|WP_Post|null $post         Post ID or WP_Post object. Default is global `$post`.
+	 *
+	 * @return int|false
+	 */
+	public function use_class_type_image( $thumbnail_id, $post = null ) {
+		if ( $post === null ) return $thumbnail_id;
+		
+		// Only apply to events with registrations enabled
+		if ( ! SFE_Registration::is_registration_enabled( $post->ID ) ) return $thumbnail_id;
+		
+		// Get the featured image from an assigned Class Type term
+		$class_types = get_the_terms( $post->ID, 'class_type' );
+		
+		if ( $class_types && ! is_wp_error( $class_types ) ) foreach( $class_types as $class_type ) {
+			// Get the default featured image ID from the class type term
+			$default_featured_image_id = get_field( 'default_featured_image_id', 'class_type_' . $class_type->term_id );
+			
+			if ( $default_featured_image_id ) {
+				// Set the featured image for the event
+				return $default_featured_image_id;
+			}
+		}
+		
+		// If no class type has a featured image, use the default from the Soulflags Events settings page
+		$default_featured_image_id = get_field( 'default_featured_image_id', 'sfe_settings' );
+		
+		if ( $default_featured_image_id ) {
+			return $default_featured_image_id;
+		}
 	}
 	
 }

@@ -385,10 +385,16 @@ class SFE_Orders {
 		$event_post_id = (int) $cart_item['sfe_event_id'];
 		if ( ! $event_post_id ) return $item_data;
 		
-		$item_data[] = array(
-			'name' => __( 'Event', 'soulflags-events' ),
-			'value' => get_the_title( $event_post_id ),
-		);
+		// Show the event title (If different than the product title)
+		$product_title = get_the_title( $product_id );
+		$event_title = get_the_title( $event_post_id );
+		
+		if ( $event_title != $product_title ) {
+			$item_data[] = array(
+				'name'  => __( 'Event', 'soulflags-events' ),
+				'value' => get_the_title( $event_post_id ),
+			);
+		}
 		
 		// Display the event date
 		$event_date_range = SFE_Events::get_event_date_range( $event_post_id );

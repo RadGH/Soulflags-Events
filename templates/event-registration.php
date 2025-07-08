@@ -25,6 +25,7 @@ $wp_query->found_posts = 0;
 $wp_query->posts = array();
 
 // Get ticket index to modify
+$price = isset( $cart_item['data'] ) ? $cart_item['data']->get_price() : null;
 $quantity = isset( $cart_item['quantity'] ) ? (int) $cart_item['quantity'] : 1;
 
 // Get the current ticket details
@@ -43,6 +44,13 @@ if ( isset($_POST['sfe_tickets']) ) {
 $page_title = __( 'Event Registration Form', 'soulflags-events' );
 $page_description = __( 'Please fill out the form below to register for the event.', 'soulflags-events' );
 $submit_label = __( 'Save Tickets', 'soulflags-events' );
+
+$event_title = get_the_title( $event_post_id ) ?: '(No event title set)';
+$event_date = SFE_Events::get_event_date_range( $event_post_id ) ?: '(No event date set)';
+$event_price = $price ?: '(No price set)';
+$event_stock = SFE_Events::get_stock_html( $quantity, '%d ticket', '(No tickets in cart)' );
+
+$event_url = get_permalink( $event_post_id );
 
 // Add body classes
 add_filter( 'body_class', function( $classes ) {
@@ -96,43 +104,67 @@ $is_page_builder_used = false;
 								<input type="hidden" name="sfe_action" value="sfe_save_tickets" />
 								<input type="hidden" name="sfe_nonce" value="<?php echo esc_attr( wp_create_nonce('save-ticket' ) ); ?>" />
 								
-								<div class="sfe-ticket-list">
-									<?php
-									// Loop through each ticket and display fields
-									for ( $ticket_index = 0; $ticket_index < $quantity; $ticket_index++ ) {
-										$entry = $ticket_data[ $ticket_index ] ?? array();
-										$name = $entry['name'] ?? '';
-										$age = $entry['age'] ?? '';
+								<div class="sfe-modal">
+									<div class="sfe-modal-heading">
+										<h2>Event Details</h2>
+									</div>
+									
+									<div class="sfe-modal-content sfe-event-summary">
+										<h3><a href="<?php echo esc_url($event_url); ?>"><?php echo $event_title; ?></a></h3>
 										
-										$name_id = 'name-' . $ticket_index;
-										$age_id = 'age-' . $ticket_index;
-										?>
-										<div class="sfe-ticket-entry">
+										<div class="event-meta">
+											<div class="meta-date"><?php echo $event_date; ?></div>
+											<div class="sep">&bull;</div>
+											<div class="meta-price"><?php echo wc_price($event_price); ?></div>
+											<div class="sep">&bull;</div>
+											<div class="meta-stock"><?php echo $event_stock; ?></div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="sfe-modal">
+									<div class="sfe-modal-heading">
+										<h2>Registration</h2>
+									</div>
+									
+									<div class="sfe-ticket-list">
+										<?php
+										// Loop through each ticket and display fields
+										for ( $ticket_index = 0; $ticket_index < $quantity; $ticket_index++ ) {
+											$entry = $ticket_data[ $ticket_index ] ?? array();
+											$name = $entry['name'] ?? '';
+											$age = $entry['age'] ?? '';
 											
-											<?php if ( $quantity > 1 ) { ?>
-												<h2 class="ticket-entry-title"><?php echo 'Ticket #' . ( $ticket_index + 1 ); ?></h2>
-											<?php } ?>
-											
-											<div class="sfe-form-fields">
-												<div class="field field-text">
-													<label for="<?php echo $name_id; ?>">Name <span class="prereq required">(Required)</span></label>
-													<input type="text" id="<?php echo $name_id; ?>" name="sfe_tickets[<?php echo $ticket_index; ?>][name]" value="<?php echo esc_attr( $name ); ?>" required />
+											$name_id = 'name-' . $ticket_index;
+											$age_id = 'age-' . $ticket_index;
+											?>
+											<div class="sfe-modal-content sfe-ticket-entry">
+												
+												<h3 class="ticket-entry-title"><?php echo 'Ticket #' . ( $ticket_index + 1 ); ?></h3>
+												
+												<div class="sfe-form-fields">
+													<div class="field field-text">
+														<label for="<?php echo $name_id; ?>">Name <span class="prereq required">(Required)</span></label>
+														<input type="text" id="<?php echo $name_id; ?>" name="sfe_tickets[<?php echo $ticket_index; ?>][name]" value="<?php echo esc_attr( $name ); ?>" required />
+													</div>
+													
+													<div class="field field-number">
+														<label for="<?php echo $age_id; ?>">Age <span class="prereq optional">(Optional)</span></label>
+														<input type="number" id="<?php echo $age_id; ?>" name="sfe_tickets[<?php echo $ticket_index; ?>][age]" value="<?php echo esc_attr( $age ); ?>" min="0" step="1" max="99" />
+													</div>
 												</div>
 												
-												<div class="field field-number">
-													<label for="<?php echo $age_id; ?>">Age <span class="prereq optional">(Optional)</span></label>
-													<input type="number" id="<?php echo $age_id; ?>" name="sfe_tickets[<?php echo $ticket_index; ?>][age]" value="<?php echo esc_attr( $age ); ?>" min="0" step="1" max="99" />
-												</div>
 											</div>
-											
-										</div>
-										<?php
-									}
-									?>
+											<?php
+										}
+										?>
+									</div>
 								</div>
 								
 								<div class="sfe-submit">
 									<button type="submit" class="button button-primary"><?php echo $submit_label; ?></button>
+									
+									<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="button button-secondary sfe-cancel-registration">Return to Cart</a>
 								</div>
 								
 							</form>
