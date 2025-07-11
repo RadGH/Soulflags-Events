@@ -89,7 +89,7 @@
 					"id": ""
 				},
 				"message": "With event registration enabled, the following fields will automatically be imported from the assigned Class Type if you leave them blank:\r\n\r\n<ul class=\"ul-disc\">\r\n<li>Post Content<\/li>\r\n<li>Featured Image<\/li>\r\n<li>Venue<\/li>\r\n<li>Price<\/li>\r\n<\/ul>",
-				"new_lines": "",
+				"new_lines": "wpautop",
 				"esc_html": 0
 			},
 			{
@@ -239,13 +239,26 @@
 					},
 					{
 						"key": "field_684c59e949478",
-						"label": "Limited Stock",
+						"label": "(Disabled) Limited Stock",
 						"name": "limited_stock",
 						"aria-label": "",
 						"type": "true_false",
 						"instructions": "",
 						"required": 0,
-						"conditional_logic": 0,
+						"conditional_logic": [
+							[
+								{
+									"field": "field_684a23b04c8f4",
+									"operator": "==",
+									"value": "1"
+								},
+								{
+									"field": "field_684a23b04c8f4",
+									"operator": "!=",
+									"value": "1"
+								}
+							]
+						],
 						"wrapper": {
 							"width": "",
 							"class": "",
@@ -260,7 +273,7 @@
 					},
 					{
 						"key": "field_684c59fb49479",
-						"label": "Stock Quantity",
+						"label": "(Disabled) Stock Quantity",
 						"name": "stock_quantity",
 						"aria-label": "",
 						"type": "number",
@@ -271,6 +284,11 @@
 								{
 									"field": "field_684c59e949478",
 									"operator": "==",
+									"value": "1"
+								},
+								{
+									"field": "field_684c59e949478",
+									"operator": "!=",
 									"value": "1"
 								}
 							]
@@ -290,6 +308,370 @@
 						"append": ""
 					}
 				]
+			},
+			{
+				"key": "field_687033acc2265",
+				"label": "Total Inventory",
+				"name": "total_inventory",
+				"aria-label": "",
+				"type": "number",
+				"instructions": "This is the number of tickets that can be purchased for the event. Leave blank to allow unlimited tickets. Set to zero to force the product to be out of stock.",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"default_value": "",
+				"min": 0,
+				"max": "",
+				"allow_in_bindings": 0,
+				"placeholder": "",
+				"step": 1,
+				"prepend": "",
+				"append": ""
+			},
+			{
+				"key": "field_684a24d697f08",
+				"label": "Registration Details",
+				"name": "",
+				"aria-label": "",
+				"type": "message",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						},
+						{
+							"field": "field_684a24424c8f9",
+							"operator": "!=empty"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "<div class=\"sfe-event-details sfe-event-details--loading\"><p>Loading registration details&hellip;<\/p><\/div>",
+				"new_lines": "",
+				"esc_html": 0
+			}
+		],
+		"location": [
+			[
+				{
+					"param": "post_type",
+					"operator": "==",
+					"value": "tribe_events"
+				}
+			]
+		],
+		"menu_order": 0,
+		"position": "acf_after_title",
+		"style": "default",
+		"label_placement": "left",
+		"instruction_placement": "field",
+		"hide_on_screen": "",
+		"active": true,
+		"description": "Post Type: Events",
+		"show_in_rest": 0
+	},
+	{
+		"key": "group_684a23aeac1cf",
+		"title": "Event Registration",
+		"fields": [
+			{
+				"key": "field_684a23b04c8f4",
+				"label": "Registrations",
+				"name": "sfe_registration_enabled",
+				"aria-label": "",
+				"type": "true_false",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "Enable registration using WooCommerce",
+				"default_value": 0,
+				"allow_in_bindings": 0,
+				"ui_on_text": "",
+				"ui_off_text": "",
+				"ui": 1
+			},
+			{
+				"key": "field_686d8855db574",
+				"label": "Instructions",
+				"name": "",
+				"aria-label": "",
+				"type": "message",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "With event registration enabled, the following fields will automatically be imported from the assigned Class Type if you leave them blank:\r\n\r\n<ul class=\"ul-disc\">\r\n<li>Post Content<\/li>\r\n<li>Featured Image<\/li>\r\n<li>Venue<\/li>\r\n<li>Price<\/li>\r\n<\/ul>",
+				"new_lines": "wpautop",
+				"esc_html": 0
+			},
+			{
+				"key": "field_684a24424c8f9",
+				"label": "Product",
+				"name": "sfe_product_id",
+				"aria-label": "",
+				"type": "post_object",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"post_type": [
+					"product"
+				],
+				"post_status": "",
+				"taxonomy": "",
+				"return_format": "id",
+				"multiple": 0,
+				"allow_null": 1,
+				"allow_in_bindings": 0,
+				"bidirectional": 0,
+				"ui": 1,
+				"bidirectional_target": []
+			},
+			{
+				"key": "field_684c598e49475",
+				"label": "Create Product",
+				"name": "sfe_create_product",
+				"aria-label": "",
+				"type": "true_false",
+				"instructions": "When the event is saved a product will be created with the same name, price, and featured image.",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						},
+						{
+							"field": "field_684a24424c8f9",
+							"operator": "==empty"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"message": "Automatically create a product when this event is saved",
+				"default_value": 0,
+				"allow_in_bindings": 0,
+				"ui": 0,
+				"ui_on_text": "",
+				"ui_off_text": ""
+			},
+			{
+				"key": "field_684c59d649477",
+				"label": "Product Settings",
+				"name": "sfe_product_settings",
+				"aria-label": "",
+				"type": "group",
+				"instructions": "",
+				"required": 0,
+				"conditional_logic": [
+					[
+						{
+							"field": "field_684a23b04c8f4",
+							"operator": "==",
+							"value": "1"
+						},
+						{
+							"field": "field_684a24424c8f9",
+							"operator": "==empty"
+						},
+						{
+							"field": "field_684c598e49475",
+							"operator": "==",
+							"value": "1"
+						}
+					]
+				],
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"layout": "block",
+				"sub_fields": [
+					{
+						"key": "field_684c5f53d9d16",
+						"label": "Price",
+						"name": "price",
+						"aria-label": "",
+						"type": "number",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": 0,
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"default_value": "",
+						"min": 0,
+						"max": "",
+						"allow_in_bindings": 0,
+						"placeholder": "",
+						"step": "0.01",
+						"prepend": "$",
+						"append": ""
+					},
+					{
+						"key": "field_684c5f13abd8a",
+						"label": "SKU",
+						"name": "sku",
+						"aria-label": "",
+						"type": "text",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": 0,
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"default_value": "",
+						"maxlength": "",
+						"allow_in_bindings": 0,
+						"placeholder": "",
+						"prepend": "",
+						"append": ""
+					},
+					{
+						"key": "field_684c59e949478",
+						"label": "(Disabled) Limited Stock",
+						"name": "limited_stock",
+						"aria-label": "",
+						"type": "true_false",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": [
+							[
+								{
+									"field": "field_684a23b04c8f4",
+									"operator": "==",
+									"value": "1"
+								},
+								{
+									"field": "field_684a23b04c8f4",
+									"operator": "!=",
+									"value": "1"
+								}
+							]
+						],
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"message": "Enable inventory limit",
+						"default_value": 0,
+						"allow_in_bindings": 0,
+						"ui": 0,
+						"ui_on_text": "",
+						"ui_off_text": ""
+					},
+					{
+						"key": "field_684c59fb49479",
+						"label": "(Disabled) Stock Quantity",
+						"name": "stock_quantity",
+						"aria-label": "",
+						"type": "number",
+						"instructions": "",
+						"required": 0,
+						"conditional_logic": [
+							[
+								{
+									"field": "field_684c59e949478",
+									"operator": "==",
+									"value": "1"
+								},
+								{
+									"field": "field_684c59e949478",
+									"operator": "!=",
+									"value": "1"
+								}
+							]
+						],
+						"wrapper": {
+							"width": "",
+							"class": "",
+							"id": ""
+						},
+						"default_value": "",
+						"min": "",
+						"max": "",
+						"allow_in_bindings": 0,
+						"placeholder": "",
+						"step": "",
+						"prepend": "",
+						"append": ""
+					}
+				]
+			},
+			{
+				"key": "field_687033acc2265",
+				"label": "Total Inventory",
+				"name": "total_inventory",
+				"aria-label": "",
+				"type": "number",
+				"instructions": "This is the number of tickets that can be purchased for the event. Leave blank to allow unlimited tickets. Set to zero to force the product to be out of stock.",
+				"required": 0,
+				"conditional_logic": 0,
+				"wrapper": {
+					"width": "",
+					"class": "",
+					"id": ""
+				},
+				"default_value": "",
+				"min": 0,
+				"max": "",
+				"allow_in_bindings": 0,
+				"placeholder": "",
+				"step": 1,
+				"prepend": "",
+				"append": ""
 			},
 			{
 				"key": "field_684a24d697f08",

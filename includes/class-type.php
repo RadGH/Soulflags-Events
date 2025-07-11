@@ -74,7 +74,7 @@ class SFE_Class_Type {
 			'hide_empty' => true,
 		) );
 		
-		$date_cutoff = date( 'Y-m-d H:i:s', strtotime( '-30 days' ) ); // current_time( 'mysql' )
+		$date_cutoff = date( 'Y-m-d H:i:s', strtotime( '-1 day' ) ); // current_time( 'mysql' )
 		
 		// Get events for each term sorted by the event start date
 		foreach( $terms as $i => $term ) {

@@ -104,7 +104,7 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 <li>Venue</li>
 <li>Price</li>
 </ul>',
-				'new_lines' => '',
+				'new_lines' => 'wpautop',
 				'esc_html' => 0,
 			),
 			array(
@@ -255,13 +255,26 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 					),
 					array(
 						'key' => 'field_684c59e949478',
-						'label' => 'Limited Stock',
+						'label' => '(Disabled) Limited Stock',
 						'name' => 'limited_stock',
 						'aria-label' => '',
 						'type' => 'true_false',
 						'instructions' => '',
 						'required' => 0,
-						'conditional_logic' => 0,
+						'conditional_logic' => array(
+							array(
+								array(
+									'field' => 'field_684a23b04c8f4',
+									'operator' => '==',
+									'value' => '1',
+								),
+								array(
+									'field' => 'field_684a23b04c8f4',
+									'operator' => '!=',
+									'value' => '1',
+								),
+							),
+						),
 						'wrapper' => array(
 							'width' => '',
 							'class' => '',
@@ -276,7 +289,7 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 					),
 					array(
 						'key' => 'field_684c59fb49479',
-						'label' => 'Stock Quantity',
+						'label' => '(Disabled) Stock Quantity',
 						'name' => 'stock_quantity',
 						'aria-label' => '',
 						'type' => 'number',
@@ -287,6 +300,11 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 								array(
 									'field' => 'field_684c59e949478',
 									'operator' => '==',
+									'value' => '1',
+								),
+								array(
+									'field' => 'field_684c59e949478',
+									'operator' => '!=',
 									'value' => '1',
 								),
 							),
@@ -306,6 +324,29 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 						'append' => '',
 					),
 				),
+			),
+			array(
+				'key' => 'field_687033acc2265',
+				'label' => 'Total Inventory',
+				'name' => 'total_inventory',
+				'aria-label' => '',
+				'type' => 'number',
+				'instructions' => 'This is the number of tickets that can be purchased for the event. Leave blank to allow unlimited tickets. Set to zero to force the product to be out of stock.',
+				'required' => 0,
+				'conditional_logic' => 0,
+				'wrapper' => array(
+					'width' => '',
+					'class' => '',
+					'id' => '',
+				),
+				'default_value' => '',
+				'min' => 0,
+				'max' => '',
+				'allow_in_bindings' => 0,
+				'placeholder' => '',
+				'step' => 1,
+				'prepend' => '',
+				'append' => '',
 			),
 			array(
 				'key' => 'field_684a24d697f08',

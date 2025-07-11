@@ -3,7 +3,7 @@
 class SFE_Events {
 	
 	public function __construct() {
-	
+		
 		// Add a column to the tribe_events post type to indicate if registration is enabled
 		add_filter( 'manage_tribe_events_posts_columns', array( $this, 'add_event_columns' ) );
 		
@@ -48,6 +48,7 @@ class SFE_Events {
 	
 	public static function get_instance() {
 		if ( !isset( self::$instance ) ) self::$instance = new static();
+		
 		return self::$instance;
 	}
 	
@@ -64,9 +65,10 @@ class SFE_Events {
 		$details = SFE_Registration::get_registration_details( $event_post_id );
 		
 		// Registration not enabled
-		if ( ! $details ) {
+		if ( !$details ) {
 			$message = __( 'Registration details are not yet available for this event.', 'soulflags-events' );
-			return '<div class="sfe-event-details sfe-event-details--error">'. wpautop( $message ) .'</div>';
+			
+			return '<div class="sfe-event-details sfe-event-details--error">' . wpautop( $message ) . '</div>';
 		}
 		
 		// Registration enabled, start building message
@@ -74,12 +76,10 @@ class SFE_Events {
 		
 		// Add number of registrations
 		$message .= sprintf(
-			_n(
-				__( 'This event has <strong>%d</strong> order:', 'soulflags-events' ),
-				__( 'This event has <strong>%d</strong> orders:', 'soulflags-events' ),
-				$details['registered_count']
-			),
-			$details['registered_count']
+			__( 'This event has used %d ticket(s) with %d remaining:', 'soulflags-events' ),
+			$details['ticket_count'],
+			$details['tickets_remaining']
+			// $details['registered_count']
 		);
 		
 		// Add a list of orders
@@ -90,10 +90,10 @@ class SFE_Events {
 				$order = wc_get_order( $order_id );
 				$order_status = $order->get_status();
 				$order_date = $order->get_date_created();
-				$order_date_formatted = date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime($order_date) );
-				$order_date_relative = human_time_diff( strtotime($order_date) );
+				$order_date_formatted = date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $order_date ) );
+				$order_date_relative = human_time_diff( strtotime( $order_date ) );
 				
-				$display_status = ucwords(str_replace('-', ' ', $order_status));
+				$display_status = ucwords( str_replace( '-', ' ', $order_status ) );
 				$order_link = get_edit_post_link( $order_id );
 				
 				$customer_list = array();
@@ -107,7 +107,7 @@ class SFE_Events {
 							$age = isset( $ticket['age'] ) ? esc_html( $ticket['age'] ) : '';
 							
 							$display_key = sprintf( __( 'Ticket #%d', 'soulflags-events' ), $ticket_index + 1 );
-							$display_label = trim( $name . ($age ? ' (age ' . $age . ')' : '') ); // Bob (age 30), John Smith (age 25)
+							$display_label = trim( $name . ( $age ? ' (age ' . $age . ')' : '' ) ); // Bob (age 30), John Smith (age 25)
 							
 							$customer_list[] = sprintf(
 								'%s: %s',
@@ -120,16 +120,16 @@ class SFE_Events {
 				}
 				
 				// If no customers for this order
-				if ( empty($customer_list) ) {
-					$customer_submenu = '<ul class="ul-circle"><li>'. __( '(No tickets found)', 'soulflags-events' ) .'</li></ul>';
+				if ( empty( $customer_list ) ) {
+					$customer_submenu = '<ul class="ul-circle"><li>' . __( '(No tickets found)', 'soulflags-events' ) . '</li></ul>';
 				}else{
-					$customer_submenu = '<ul class="ul-circle"><li>' . implode( '</li><li>', $customer_list ) . '&gt;</li></ul>';
+					$customer_submenu = '<ul class="ul-circle"><li>' . implode( '</li><li>', $customer_list ) . '</li></ul>';
 				}
 				
 				$message .= sprintf(
 					'<li>Order <a href="%s" target="_blank">#%d</a> (%s) &ndash; %s (%s ago) %s</li>',
 					esc_url( $order_link ),
-					(int) $order_id,
+					(int)$order_id,
 					$display_status,
 					$order_date_formatted,
 					$order_date_relative,
@@ -140,7 +140,7 @@ class SFE_Events {
 		}
 		
 		// Return formatted message with wrapper
-		return '<div class="sfe-event-details sfe-event-details--success">'. wpautop( $message ) .'</div>';
+		return '<div class="sfe-event-details sfe-event-details--success">' . wpautop( $message ) . '</div>';
 	}
 	
 	/**
@@ -151,11 +151,11 @@ class SFE_Events {
 	 * @return int|false
 	 */
 	public static function get_event_product_id( $event_post_id ) {
-		if ( ! SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
+		if ( !SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
 		
 		// Get the product ID associated with the event
-		$product_id = (int) get_post_meta( $event_post_id, 'sfe_product_id', true );
-		if ( ! $product_id ) return false;
+		$product_id = (int)get_post_meta( $event_post_id, 'sfe_product_id', true );
+		if ( !$product_id ) return false;
 		
 		// Check if the product exists
 		if ( get_post_type( $product_id ) !== 'product' ) {
@@ -174,15 +174,15 @@ class SFE_Events {
 	 * @return string|false
 	 */
 	public static function get_event_price( $event_post_id, $with_currency_symbol = true ) {
-		if ( ! SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
+		if ( !SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
 		
 		// Get the product ID associated with the event
 		$product_id = self::get_event_product_id( $event_post_id );
-		if ( ! $product_id ) return false;
+		if ( !$product_id ) return false;
 		
 		// Get the product price
 		$product = wc_get_product( $product_id );
-		if ( ! $product || ! $product->exists() ) return false;
+		if ( !$product || !$product->exists() ) return false;
 		
 		// Get the product price
 		$cost = $product->get_price();
@@ -196,23 +196,100 @@ class SFE_Events {
 	}
 	
 	/**
-	 * Get the stock HTML for an event
+	 * Get the remaining stock for an event. Returns NULL if unlimited stock is available.
 	 *
 	 * @param int $event_post_id
 	 *
+	 * @return int|null
+	 */
+	public static function get_stock_remaining( $event_post_id ) {
+		if ( !SFE_Registration::is_registration_enabled( $event_post_id ) ) return 0;
+		
+		$total = self::get_stock_total( $event_post_id );
+		if ( $total === null ) return null; // Unlimited stock
+		
+		$stock_used = self::get_stock_used( $event_post_id );
+		
+		return max( 0, $total - $stock_used ); // Ensure non-negative stock
+	}
+	
+	/**
+	 * Gets the amount of stock used for an event based on current orders and the number of tickets per order.
+	 *
+	 * @param int $event_post_id
+	 *
+	 * @return int
+	 */
+	public static function get_stock_used( $event_post_id ) {
+		// @todo: Cache this value until orders are updated or a new order is placed?
+		$orders = SFE_Registration::get_event_order_ids( $event_post_id );
+		$stock_used = 0;
+		
+		if ( $orders ) {
+			foreach( $orders as $order_id ) {
+				$order = wc_get_order( $order_id );
+				foreach( $order->get_items() as $order_item ) {
+					if ( $order_item->get_type() != 'line_item' ) continue;
+					
+					$item_event_id = $order_item->get_meta( '_sfe_event_id' );
+					$item_tickets = $order_item->get_meta( '_sfe_tickets' );
+					
+					// Check if it's the correct event
+					if ( $item_event_id != $event_post_id ) continue;
+					
+					// Add the number of tickets
+					if ( is_array( $item_tickets ) && count( $item_tickets ) > 0 ) {
+						$stock_used += count( $item_tickets );
+					}
+				}
+			}
+		}
+		
+		return $stock_used;
+	}
+	
+	/**
+	 * Gets the stock available for an event.
+	 * Returns the number of available tickets for the event (which may be zero), or null if unlimited tickets are allowed.
+	 *
+	 * @param $event_post_id
+	 *
+	 * @return int|null
+	 */
+	public static function get_stock_total( $event_post_id ) {
+		if ( ! SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
+		
+		$inventory = get_field( 'total_inventory', $event_post_id );
+		
+		// If blank = Unlimited tickets
+		if ( $inventory === '' ) return null;
+		
+		// Ensure it's a non-negative integer
+		return max( 0, (int) $inventory );
+	}
+	
+	/**
+	 * Get the stock HTML for an event
+	 *
+	 * @param int $event_post_id
+	 * @param int|null|false $stock_remaining The remaining stock as an int or null. Leave blank to fetch it automatically (false).
+	 *
 	 * @return string
 	 */
-	public static function get_event_stock_html( $event_post_id ) {
+	public static function get_event_stock_html( $event_post_id, $stock_remaining = false ) {
 		// Hide stock for expired events
 		if ( self::is_event_expired( $event_post_id ) ) return 'Event expired';
 		
-		$product_id = self::get_event_product_id( $event_post_id );
-		if ( ! $product_id ) return '';
+		// Get stock remaining, if not provided by 2nd arg
+		if ( $stock_remaining === false ) $stock_remaining = self::get_stock_remaining( $event_post_id );
 		
-		$product = wc_get_product( $product_id );
-		if ( ! $product || ! $product->exists() ) return '';
+		// If unlimited stock, return null
+		if ( $stock_remaining === null ) return null;
 		
-		return wc_get_stock_html( $product );
+		return sprintf(
+			_n('%d ticket available', '%d tickets available', $stock_remaining, 'soulflags-events'),
+			$stock_remaining
+		);
 	}
 	
 	/**
@@ -235,6 +312,27 @@ class SFE_Events {
 	}
 	
 	/**
+	 * Checks if an event is available for purchase
+	 *
+	 * @param int $event_post_id
+	 *
+	 * @return bool
+	 */
+	public static function is_available_for_purchase( $event_post_id ) {
+		// Check if valid event
+		if ( ! SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
+		
+		// Check if not expired
+		if ( self::is_event_expired( $event_post_id ) ) return false;
+		
+		// Check if stock is available
+		$stock_remaining = self::get_stock_remaining( $event_post_id );
+		if ( $stock_remaining === null ) return true;
+		
+		return $stock_remaining > 0;
+	}
+	
+	/**
 	 * Checks if an event is expired based on its start and end date (whichever is greater). Events expire at the end of their last day.
 	 *
 	 * @param int $event_post_id
@@ -252,9 +350,11 @@ class SFE_Events {
 		$date_ymd = $end_date ?: $start_date;
 		if ( ! $date_ymd ) return false; // No date, doesn't expire
 		
-		// Check if it expired at least 18 hours ago
-		// return strtotime( $date_ymd ) < strtotime( '-18 hours' );
-		return strtotime( $date_ymd ) < strtotime( '0 hours' );
+		// Check if it expired
+		$now_ts = current_time( 'timestamp' );
+		$date_ts = strtotime( $date_ymd );
+		
+		return $date_ts < $now_ts;
 	}
 	
 	/**
@@ -415,7 +515,36 @@ class SFE_Events {
 		if ( $column === 'sfe_registration_enabled' ) {
 			$registration_enabled = get_post_meta( $post_id, 'sfe_registration_enabled', true );
 			if ( $registration_enabled ) {
-				echo '<span class="dashicons dashicons-yes-alt"></span> <span class="screen-reader-text">' . __( 'Registration Enabled', 'soulflags-events' ) . '</span>';
+				
+				echo '<span class="sfe-event-registration-summary">';
+				
+				$icon_available = '<span class="dashicons dashicons-yes-alt"></span> <span class="screen-reader-text">' . __( 'Registration Enabled', 'soulflags-events' ) . '</span>';
+				$icon_outofstock = '<span class="dashicons dashicons-no-alt"></span> <span class="screen-reader-text">' . __( 'Registration Disabled', 'soulflags-events' ) . '</span>';
+				
+				$total = self::get_stock_total( $post_id );
+				if ( $total === null ) {
+					// Unlimited stock
+					echo $icon_available;
+					echo __( 'Unlimited', 'soulflags-events' );
+				} else {
+					$remaining = self::get_stock_remaining( $post_id );
+					
+					if ( $remaining === 0 ) {
+						echo $icon_outofstock;
+					} else {
+						echo $icon_available;
+					}
+					
+					echo sprintf( __( '%d of %d Tickets Available', 'soulflags-events' ), $remaining, $total );
+					
+					if ( $remaining === 0 ) {
+						// Out of stock
+						echo '<br>';
+						echo '<em>' . __( 'Out of Stock', 'soulflags-events' ) . '</em>';
+					}
+				}
+				
+				echo '</span>';
 			} else {
 				echo '<span class="screen-reader-text">' . __( 'Registration Disabled', 'soulflags-events' ) . '</span>';
 			}
@@ -496,15 +625,22 @@ class SFE_Events {
 		// Get product settings
 		$settings = get_field( 'sfe_product_settings', $event_post_id );
 		
-		$limited_stock = $settings['limited_stock'] ?? false;
 		$price = $settings['price'] ?? false;
 		$sku = $settings['sku'] ?? false;
+		
+		/*
+		$limited_stock = $settings['limited_stock'] ?? false;
 		$stock_quantity = $settings['stock_quantity'] ?? 0;
 		
 		// Validate product settings
 		if ( ! $limited_stock ) {
 			$stock_quantity = -1; // -1 means unlimited stock
 		}
+		*/
+		
+		// Now stock is managed using an ACF field on the event (total_inventory)
+		// The WooCommerce product will always have unlimited stock
+		$stock_quantity = -1; // -1 means unlimited stock
 		
 		// Create the product associated with the event
 		$product_id = self::create_product_for_event( $event_post_id, $price, $sku, $stock_quantity );

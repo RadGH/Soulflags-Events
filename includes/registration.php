@@ -53,10 +53,16 @@ class SFE_Registration {
 		// Get the url to the event registration page
 		$registration_url = get_permalink( $event_post_id );
 		
+		// Count the number of tickets
+		$tickets_remaining = SFE_Events::get_event_stock_html( $event_post_id );
+		$ticket_count = SFE_Events::get_stock_used( $event_post_id );
+		
 		return array(
 			'event_id' => $event_post_id,
 			'registered_count' => $registered_count,
 			'registration_url' => $registration_url,
+			'tickets_remaining' => $tickets_remaining,
+			'ticket_count' => $ticket_count,
 		);
 	}
 	
