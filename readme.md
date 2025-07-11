@@ -27,6 +27,9 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 
 ## Changelog
 
+### 1.2.0
+- Changed events to manage their own inventory, instead of using WooCommerce's stock system.
+
 ### 1.1.8
 - General styling
 - Updated "Registration Details" to include ticket names and ages
