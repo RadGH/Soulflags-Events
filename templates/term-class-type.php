@@ -38,15 +38,8 @@ get_header();
 						<div class="sfe-back-to-events">
 							<?php
 							// Link back to the main events page
-							$back_page = (int) get_field( 'classes_page', 'sfe_settings' );
-							
-							if ( $back_page ) {
-								$back_label = sprintf( __( '&larr; Back to %s', 'soulflags-events' ), get_the_title( $back_page ) );
-								$back_url = get_permalink( $back_page );
-							}else{
-								$back_label = __( '&larr; Back to Events', 'soulflags-events' );
-								$back_url = get_post_type_archive_link( 'tribe_events' );
-							}
+							$back_label = __( '&larr; Back to Events', 'soulflags-events' );
+							$back_url = get_post_type_archive_link( 'tribe_events' );
 							
 							echo '<a href="' . esc_url( $back_url ) . '" class="button sfe-back-to-events-link">' . $back_label . '</a>';
 							?>
