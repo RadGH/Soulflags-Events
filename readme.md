@@ -30,6 +30,7 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 ### 1.2.0
 - Changed events to manage their own inventory, instead of using WooCommerce's stock system.
 - Fixed alignment of available classes shortcode
+- Simplified back link
 
 ### 1.1.8
 - General styling
