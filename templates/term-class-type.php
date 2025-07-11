@@ -22,6 +22,10 @@ get_header();
 					<article id="post-<?php the_ID(); ?>" <?php post_class( 'term-class_type' ); ?>>
 						
 						<?php
+						include( SFE_PATH . '/templates/parts/term-image.php' );
+						?>
+						
+						<?php
 						include( SFE_PATH . '/templates/parts/term-summary.php' );
 						?>
 						

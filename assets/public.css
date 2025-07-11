@@ -141,10 +141,13 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 }
 
 /* Event List (Available classes shortcode and Class Type term page) */
+.sfe-term-details {
+	overflow: hidden;
+}
+
 .sfe-classes-list {
 	margin-top: 10px;
 	margin-left: 20px;
-	overflow: hidden;
 }
 
 .sfe-classes-list .event-row {

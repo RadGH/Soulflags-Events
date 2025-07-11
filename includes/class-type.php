@@ -135,6 +135,10 @@ class SFE_Class_Type {
 				
 				echo '<div class="class-category term-id-' . esc_attr( $term->term_id ) . '">';
 				
+				include( SFE_PATH . '/templates/parts/term-image.php' );
+				
+				echo '<div class="sfe-term-details">';
+				
 				// Display event title and description
 				include( SFE_PATH . '/templates/parts/term-summary.php' );
 				
@@ -142,7 +146,7 @@ class SFE_Class_Type {
 				$posts = $term->posts;
 				include( SFE_PATH . '/templates/parts/event-list.php' );
 				
-				echo '</ul>';
+				echo '</div>';
 				
 				echo '</div>';
 			}
