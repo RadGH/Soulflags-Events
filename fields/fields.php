@@ -253,76 +253,6 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 						'prepend' => '',
 						'append' => '',
 					),
-					array(
-						'key' => 'field_684c59e949478',
-						'label' => '(Disabled) Limited Stock',
-						'name' => 'limited_stock',
-						'aria-label' => '',
-						'type' => 'true_false',
-						'instructions' => '',
-						'required' => 0,
-						'conditional_logic' => array(
-							array(
-								array(
-									'field' => 'field_684a23b04c8f4',
-									'operator' => '==',
-									'value' => '1',
-								),
-								array(
-									'field' => 'field_684a23b04c8f4',
-									'operator' => '!=',
-									'value' => '1',
-								),
-							),
-						),
-						'wrapper' => array(
-							'width' => '',
-							'class' => '',
-							'id' => '',
-						),
-						'message' => 'Enable inventory limit',
-						'default_value' => 0,
-						'allow_in_bindings' => 0,
-						'ui' => 0,
-						'ui_on_text' => '',
-						'ui_off_text' => '',
-					),
-					array(
-						'key' => 'field_684c59fb49479',
-						'label' => '(Disabled) Stock Quantity',
-						'name' => 'stock_quantity',
-						'aria-label' => '',
-						'type' => 'number',
-						'instructions' => '',
-						'required' => 0,
-						'conditional_logic' => array(
-							array(
-								array(
-									'field' => 'field_684c59e949478',
-									'operator' => '==',
-									'value' => '1',
-								),
-								array(
-									'field' => 'field_684c59e949478',
-									'operator' => '!=',
-									'value' => '1',
-								),
-							),
-						),
-						'wrapper' => array(
-							'width' => '',
-							'class' => '',
-							'id' => '',
-						),
-						'default_value' => '',
-						'min' => '',
-						'max' => '',
-						'allow_in_bindings' => 0,
-						'placeholder' => '',
-						'step' => '',
-						'prepend' => '',
-						'append' => '',
-					),
 				),
 			),
 			array(
@@ -333,7 +263,15 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 				'type' => 'number',
 				'instructions' => 'This is the number of tickets that can be purchased for the event. Leave blank to allow unlimited tickets. Set to zero to force the product to be out of stock.',
 				'required' => 0,
-				'conditional_logic' => 0,
+				'conditional_logic' => array(
+					array(
+						array(
+							'field' => 'field_684a23b04c8f4',
+							'operator' => '==',
+							'value' => '1',
+						),
+					),
+				),
 				'wrapper' => array(
 					'width' => '',
 					'class' => '',
@@ -427,34 +365,6 @@ To get started, create or edit an event and enable "Event Registrations". Then c
 				'allow_in_bindings' => 0,
 				'bidirectional' => 0,
 				'multiple' => 0,
-				'bidirectional_target' => array(
-				),
-			),
-			array(
-				'key' => 'field_684db56380b55',
-				'label' => 'Classes Page',
-				'name' => 'classes_page',
-				'aria-label' => '',
-				'type' => 'post_object',
-				'instructions' => 'Used for the "Back to Classes" link on the Class Type term pages.',
-				'required' => 0,
-				'conditional_logic' => 0,
-				'wrapper' => array(
-					'width' => '',
-					'class' => '',
-					'id' => '',
-				),
-				'post_type' => array(
-					0 => 'page',
-				),
-				'post_status' => '',
-				'taxonomy' => '',
-				'return_format' => 'id',
-				'multiple' => 0,
-				'allow_null' => 1,
-				'allow_in_bindings' => 0,
-				'bidirectional' => 0,
-				'ui' => 1,
 				'bidirectional_target' => array(
 				),
 			),
