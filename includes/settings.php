@@ -40,9 +40,10 @@ class SFE_Settings {
 	 * Add an ACF settings page to manage settings
 	 */
 	public function acf_add_settings_pages() {
-		if ( function_exists('acf_add_options_page') ) {
-			acf_add_options_page( array(
-				'menu_title' => 'Soulflags Events',
+		if ( function_exists('acf_add_options_sub_page') ) {
+			acf_add_options_sub_page( array(
+				'parent_slug' => 'edit.php?post_type=tribe_events',
+				'menu_title' => 'Class Settings',
 				'page_title' => 'Soulflags Events Settings (sfe_settings)',
 				'menu_slug' => 'sfe-settings',
 				'capability' => 'manage_options',
@@ -162,35 +163,6 @@ class SFE_Settings {
 	public function add_query_vars( $vars ) {
 		$vars[] = 'sfe_cart_item_key';
 		return $vars;
-	}
-	
-	/**
-	 * If viewing the event product registration page, load our custom page template
-	 *
-	 * @param WP $wp
-	 * @return void
-	 */
-	public function maybe_display_product_registration_template( $wp ) {
-		$cart_item_key = get_query_var( 'sfe_cart_item_key' );
-		if ( ! $cart_item_key ) return;
-
-		if ( ! WC()->cart ) {
-			wp_die( 'Could not display the event product registration page: The cart is not available.', 'Cart Not Available', array( 'response' => 500, 'back_link' => true ) );
-			exit;
-		}
-		
-		$cart_item = WC()->cart->get_cart_item( $cart_item_key );
-		if ( ! $cart_item ) {
-			wp_die( 'Could not display the event product registration page: Invalid cart item specified.', 'Cart Not Available', array( 'response' => 500, 'back_link' => true ) );
-			exit;
-		}
-		
-		echo '<pre>';
-		var_dump($cart_item_key, $cart_item);
-		exit;
-
-		include SFE_PATH . '/templates/product-registration.php';
-		exit;
 	}
 	
 	/**

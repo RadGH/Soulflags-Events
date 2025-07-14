@@ -2,7 +2,7 @@
 /*
 Plugin Name: Soulflags Events
 Description: Adds an integration between The Events Calendar, Gravity Forms, and Advanced Custom Fields, to create and manage classes with registration.
-Version: 1.2.3
+Version: 1.2.5
 Author: ZingMap, Radley Sustaire
 Author URI: https://zingmap.com
 Date Created: 6/9/2025
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 define( 'SFE_PATH', __DIR__ );
 define( 'SFE_URL', untrailingslashit(plugin_dir_url(__FILE__)) );
-define( 'SFE_VERSION', '1.2.3' );
+define( 'SFE_VERSION', '1.2.5' );
 
 class SFE_Plugin {
 	
@@ -54,6 +54,7 @@ class SFE_Plugin {
 		require_once( SFE_PATH . '/includes/form.php' );
 		require_once( SFE_PATH . '/includes/orders.php' );
 		require_once( SFE_PATH . '/includes/registration.php' );
+		require_once( SFE_PATH . '/includes/report.php' );
 		require_once( SFE_PATH . '/includes/settings.php' );
 		
 		// After the plugin has been activated, flush rewrite rules, upgrade database, etc.

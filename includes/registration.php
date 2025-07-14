@@ -38,7 +38,7 @@ class SFE_Registration {
 	 * @return array|false {
 	 *     @type int    $event_id          The ID of the event post.
 	 *     @type bool   $inventory_enabled Whether inventory tracking is enabled for the event.
-	 *     @type int    $inventory_total   The total inventory available for the event.
+	 *     @type int    $total_inventory   The total inventory available for the event.
 	 *     @type int    $registered_count  The number of registrations for the event.
 	 *     @type string $registration_url  The URL to the event registration page.
 	 * }
@@ -52,6 +52,7 @@ class SFE_Registration {
 		
 		// Get the url to the event registration page
 		$registration_url = get_permalink( $event_post_id );
+		$total_inventory = SFE_Events::get_stock_total( $event_post_id );
 		
 		// Count the number of tickets
 		$tickets_remaining = SFE_Events::get_event_stock_html( $event_post_id );
@@ -61,6 +62,7 @@ class SFE_Registration {
 			'event_id' => $event_post_id,
 			'registered_count' => $registered_count,
 			'registration_url' => $registration_url,
+			'total_inventory' => $total_inventory,
 			'tickets_remaining' => $tickets_remaining,
 			'ticket_count' => $ticket_count,
 		);

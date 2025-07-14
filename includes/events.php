@@ -76,9 +76,9 @@ class SFE_Events {
 		
 		// Add number of registrations
 		$message .= sprintf(
-			__( 'This event has used %d of %d ticket(s):', 'soulflags-events' ),
+			__( 'This event has used %d of %s ticket(s):', 'soulflags-events' ),
 			$details['ticket_count'],
-			$details['inventory_total']
+			$details['total_inventory'] === null ? __( 'unlimited', 'soulflags-events' ) : $details['total_inventory']
 		);
 		
 		// Add a list of orders

@@ -64,7 +64,11 @@ class SFE_Class_Type {
 	public function list_classes_shortcode( $atts, $content = '', $shortcode_name = 'souflags_list_classes' ) {
 		// Extract shortcode attributes
 		$atts = shortcode_atts( array(
+			'show_classes_only' => true,
 		), $atts, $shortcode_name );
+		
+		// Load settings
+		$show_classes_only = filter_var( $atts['show_classes_only'], FILTER_VALIDATE_BOOLEAN );
 		
 		ob_start();
 		
@@ -101,6 +105,15 @@ class SFE_Class_Type {
 				'orderby' => 'meta_value',
 				'order'   => 'ASC',
 			);
+			
+			if ( $show_classes_only ) {
+				// Only show events that are classes
+				$args['meta_query'][] = array(
+					'key'     => 'sfe_registration_enabled',
+					'value'   => '1',
+					'compare' => '=',
+				);
+			}
 			
 			$query = new WP_Query( $args );
 			

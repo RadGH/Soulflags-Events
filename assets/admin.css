@@ -26,3 +26,17 @@ ol ul.ul-circle,
 ul ul.ul-circle {
 	margin-left: 1.8em;
 }
+
+/* Class Report */
+table.sfe-class-report .col-title {
+	width: 25%;
+}
+
+table.sfe-class-report .col-start-date,
+table.sfe-class-report .col-end-date {
+	width: 120px;
+}
+
+table.sfe-class-report .col-tickets {
+	width: auto;
+}
