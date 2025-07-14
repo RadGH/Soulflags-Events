@@ -39,7 +39,7 @@ class SFE_Events {
 		add_action( 'tec_events_view_venue_after_address', array( $this, 'insert_add_to_cart_button_on_event' ), 20 );
 		
 		// Use a default venue from the Soulflags settings page
-		add_filter( 'tribe_get_venue_id', array( $this, 'get_default_venue' ), 10, 2 );
+		add_filter( 'tribe_get_venue_id', array( $this, 'use_default_venue' ), 10, 2 );
 		
 	}
 	
@@ -780,12 +780,9 @@ class SFE_Events {
 	 *
 	 * @return int|false
 	 */
-	public function get_default_venue( $venue_id, $post_id = null ) {
+	public function use_default_venue( $venue_id, $post_id = null ) {
 		// Keep pre-defined venue
 		if ( $venue_id ) return $venue_id;
-		
-		// Only apply to events with registrations enabled
-		if ( ! SFE_Registration::is_registration_enabled( $post_id ) ) return $venue_id;
 		
 		$default_venue_id = get_field( 'default_venue', 'sfe_settings' );
 		

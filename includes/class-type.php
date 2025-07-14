@@ -226,9 +226,6 @@ class SFE_Class_Type {
 		
 		if ( ! is_singular( 'tribe_events' ) ) return $content;
 		
-		// Only apply to events with registrations enabled
-		if ( ! SFE_Registration::is_registration_enabled( $post->ID ) ) return $content;
-		
 		// If the event already has content, use that
 		if ( ! empty( $content ) ) return $content;
 		
@@ -261,9 +258,6 @@ class SFE_Class_Type {
 	 */
 	public function use_class_type_image( $thumbnail_id, $post = null ) {
 		if ( $post === null ) return $thumbnail_id;
-		
-		// Only apply to events with registrations enabled
-		if ( ! SFE_Registration::is_registration_enabled( $post->ID ) ) return $thumbnail_id;
 		
 		// Get the featured image from an assigned Class Type term
 		$class_types = get_the_terms( $post->ID, 'class_type' );
