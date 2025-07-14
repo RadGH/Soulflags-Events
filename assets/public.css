@@ -140,6 +140,11 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 	text-decoration: underline;
 }
 
+.sfe-available-classes .event-row a {
+	font-weight: 700;
+	text-decoration: underline;
+}
+
 /* Event List (Available classes shortcode and Class Type term page) */
 .sfe-term-details {
 	overflow: hidden;
@@ -185,6 +190,16 @@ body.single-tribe_events .sfe-product-cart-button .product-price {
 /* Cart and Checkout - Hide product description if event name is shown */
 .wc-block-components-product-metadata:has(.wc-block-components-product-details__event) .wc-block-components-product-metadata__description {
 	display: none;
+}
+
+/* Checkout formatting */
+.woocommerce-checkout .woocommerce ul.woocommerce-order-overview {
+	margin-top: 40px;
+}
+
+.woocommerce-info.sfe-punchcard-notice {
+	background: #eee !important;
+	color: #3d3d3d !important;
 }
 
 /* Footer logo strip */

@@ -76,10 +76,9 @@ class SFE_Events {
 		
 		// Add number of registrations
 		$message .= sprintf(
-			__( 'This event has used %d ticket(s) with %d remaining:', 'soulflags-events' ),
+			__( 'This event has used %d of %d ticket(s):', 'soulflags-events' ),
 			$details['ticket_count'],
-			$details['tickets_remaining']
-			// $details['registered_count']
+			$details['inventory_total']
 		);
 		
 		// Add a list of orders
@@ -97,6 +96,8 @@ class SFE_Events {
 				$order_link = get_edit_post_link( $order_id );
 				
 				$customer_list = array();
+				
+				$customer_email = $order->get_billing_email();
 				
 				foreach( $order->get_items() as $order_item ) {
 					if ( $order_item->get_type() === 'line_item' && $order_item->get_meta( '_sfe_tickets' ) ) {
@@ -127,10 +128,12 @@ class SFE_Events {
 				}
 				
 				$message .= sprintf(
-					'<li>Order <a href="%s" target="_blank">#%d</a> (%s) &ndash; %s (%s ago) %s</li>',
+					'<li>Order <a href="%s" target="_blank">#%d</a> (%s) &ndash; <a href="%s" target="_blank">%s</a> &ndash; %s (%s ago) %s</li>',
 					esc_url( $order_link ),
 					(int)$order_id,
 					$display_status,
+					esc_attr( 'mailto:' . $customer_email ),
+					esc_html( $customer_email ),
 					$order_date_formatted,
 					$order_date_relative,
 					$customer_submenu
@@ -277,6 +280,8 @@ class SFE_Events {
 	 * @return string
 	 */
 	public static function get_event_stock_html( $event_post_id, $stock_remaining = false ) {
+		if ( ! SFE_Registration::is_registration_enabled( $event_post_id ) ) return false;
+		
 		// Hide stock for expired events
 		if ( self::is_event_expired( $event_post_id ) ) return 'Event expired';
 		

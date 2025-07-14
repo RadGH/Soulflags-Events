@@ -16,6 +16,12 @@ class SFE_Settings {
 		// Customize the admin menu pages to simplify the Events menu
 		add_action( 'admin_menu', array( $this, 'customize_admin_menu' ), 100000 );
 		
+		// Add a message to the top of the Checkout page to explain users can also use punch cards
+		add_shortcode( 'soulflags_above_checkout', array( $this, 'shortcode_soulflags_above_checkout' ) );
+		
+		// Disable order notes
+		add_filter( 'woocommerce_enable_order_notes_field', '__return_false' );
+		
 	}
 	
 	// Singleton instance
@@ -185,6 +191,21 @@ class SFE_Settings {
 
 		include SFE_PATH . '/templates/product-registration.php';
 		exit;
+	}
+	
+	/**
+	 * Add a message to the top of the Checkout page to explain users can also use punch cards
+	 *
+	 * @param array $atts
+	 * @param string $content
+	 * @param string $shortcode_name
+	 *
+	 * @return string
+	 */
+	public function shortcode_soulflags_above_checkout( $atts, $content = '', $shortcode_name = 'soulflags_above_checkout' ) {
+		$message = __( 'If you have a punch card when you arrive we can credit you back for the payment at the time of the event.', 'soulflags-events' );
+		$message = wpautop($message);
+		return '<div class="woocommerce-info sfe-punchcard-notice">' . $message . '</div>';
 	}
 	
 }
