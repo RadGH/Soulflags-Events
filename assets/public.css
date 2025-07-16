@@ -463,3 +463,33 @@ article.tribe-events-calendar-list__event:has(.tribe-events-calendar-list__event
 article.tribe-events-calendar-list__event .tribe-events-calendar-list__event-featured-image-wrapper {
 	max-width: 200px;
 }
+
+/* Fix cart variations weird multi-row layout */
+.woocommerce-cart table.shop_table .variation {
+	margin: 5px 0 0;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 2px 8px;
+	font-weight: 400;
+}
+
+.woocommerce-cart table.shop_table .variation dt {
+	font-weight: 600;
+}
+
+.woocommerce-cart table.shop_table .variation dd {
+	margin-left: 0;
+}
+
+/* Make variation links look like a link */
+.variation a {
+	text-decoration: underline;
+	font-weight: 600;
+}
+
+/* Fix product title being hidden on mobile on cart page */
+@media ( max-width: 768px ) {
+	.woocommerce table.shop_table_responsive tbody th, .woocommerce-page table.shop_table_responsive tbody th {
+		display: block;
+	}
+}
