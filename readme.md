@@ -27,7 +27,7 @@ Classes displayed using this shortcode are ordered by the next event and grouped
 
 ## Changelog
 
-### 1.2.6
+### 1.2.7
 - Added cart styles
 - Use Class Type fields by default, not just for events with payments
 - Fixed alignment of available classes shortcode
